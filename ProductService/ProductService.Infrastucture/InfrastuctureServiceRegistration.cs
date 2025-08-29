@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CleanArchitecture.Infrastucture.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ProductService.Infrastucture.Percistence;
+using ProductService.Application.Contracts.Persistence;
+using ProductService.Infrastucture.Repositories;
 
 namespace ProductService.Infrastucture
 {
@@ -9,9 +10,8 @@ namespace ProductService.Infrastucture
     {
         public static IServiceCollection AddInfrastuctureServices(this IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddDbContext<ProductDbContext>(options =>
-            //options.UseSqlServer(configuration.GetConnectionString("ConnectionString"))
-            //);
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(RepositoryBase<>));
+            services.AddScoped<IProductRepository, ProductRepository>();
 
             return services;
         }
