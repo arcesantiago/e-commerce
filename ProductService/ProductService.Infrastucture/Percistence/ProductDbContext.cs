@@ -6,12 +6,17 @@ namespace ProductService.Infrastucture.Percistence
 {
     public class ProductDbContext : DbContext
     {
+        public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
+        {
+
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;
-                Initial Catalog=Product; Integrated Security=True")
-                .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, Microsoft.Extensions.Logging.LogLevel.Information)
-                .EnableSensitiveDataLogging();
+            //optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;
+            //    Initial Catalog=Product; Integrated Security=True")
+            //    .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, Microsoft.Extensions.Logging.LogLevel.Information)
+            //    .EnableSensitiveDataLogging();
         }
         public DbSet<Product>? Products { get; set; }
 

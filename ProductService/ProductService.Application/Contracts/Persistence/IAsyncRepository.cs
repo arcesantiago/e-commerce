@@ -1,4 +1,5 @@
-﻿using ProductService.Domain.Common;
+﻿using ProductService.Application.Models;
+using ProductService.Domain.Common;
 using System.Linq.Expressions;
 
 namespace ProductService.Application.Contracts.Persistence
@@ -7,22 +8,27 @@ namespace ProductService.Application.Contracts.Persistence
     {
         Task<IReadOnlyList<T>> GetAllAsync();
         Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate);
-        Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate = null,
-            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-            string includeString = null,
+        Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>>? predicate = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+            string? includeString = null,
             bool disableTracking = true);
 
-        Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate = null,
-            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-            List<Expression<Func<T, object>>> includes = null,
+        Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>>? predicate = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+            List<Expression<Func<T, object>>>? includes = null,
             bool disableTracking = true);
-        Task<T> GetByIdAsync(int id);
+
+        Task<PagedResult<T>> GetPaginatedAsync(int currentPage, 
+            int pageSize, 
+            Expression<Func<T, bool>>? predicate = null, 
+            Func<IQueryable<T>, 
+            IOrderedQueryable<T>>? orderBy = null, 
+            List<Expression<Func<T, object>>>? includes = null, 
+            bool disableTracking = true);
+
+        Task<T?> GetByIdAsync(int id);
         Task<T> AddAsync(T entity);
         Task<T> UpdateAsync(T entity);
         Task DeleteAsync(T entity);
-
-        void AddEntity(T entity);
-        void UpdateEntity(T entity);
-        void DeleteEntity(T entity);
     }
 }

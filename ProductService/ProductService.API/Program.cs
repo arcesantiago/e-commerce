@@ -1,3 +1,7 @@
+using ProductService.API.Middleware;
+using ProductService.Application;
+using ProductService.Infrastucture;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +11,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddInfrastuctureServices(builder.Configuration);
+builder.Services.AddAplicationServices();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -15,6 +22,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
