@@ -1,7 +1,7 @@
-﻿using CleanArchitecture.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ProductService.Domain;
 using ProductService.Infrastructure.Percistence;
+using ProductService.Infrastructure.Repositories;
 using System.Linq.Expressions;
 
 namespace ProductService.Infrastucture.Test.IntegrationTests

@@ -1,17 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProductService.Application.Contracts.Persistence;
-using ProductService.Application.Models;
-using ProductService.Domain.Common;
-using ProductService.Infrastructure.Percistence;
+using OrderService.Application.Contracts.Persistence;
+using OrderService.Domain.Common;
+using OrderService.Infrastructure.Percistence;
 using System.Linq.Expressions;
 
-namespace ProductService.Infrastructure.Repositories
+namespace OrderService.Infrastructure.Repositories
 {
     public class RepositoryBase<T> : IAsyncRepository<T> where T : BaseDomainModel
     {
-        protected readonly ProductDbContext _context;
+        protected readonly OrderDbContext _context;
 
-        public RepositoryBase(ProductDbContext context)
+        public RepositoryBase(OrderDbContext context)
         {
             _context = context;
         }
@@ -69,30 +68,6 @@ namespace ProductService.Infrastructure.Repositories
             if (orderBy is not null) return await orderBy(query).ToListAsync();
 
             return await query.ToListAsync();
-        }
-
-        public async Task<PagedResult<T>> GetPaginatedAsync(int currentPage, int pageSize, Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, List<Expression<Func<T, object>>>? includes = null, bool disableTracking = true)
-        {
-            IQueryable<T> query = _context.Set<T>();
-
-            if (disableTracking) query = query.AsNoTracking();
-
-            if (includes is not null) query = includes.Aggregate(query, (current, include) => current.Include(include));
-
-            if (predicate is not null) query = query.Where(predicate);
-
-            if (orderBy is not null) orderBy(query);
-
-            var skip = (currentPage - 1) * pageSize;
-
-            var rowsCount = await query.CountAsync();
-
-            var results = await query
-                .Skip(skip)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return new PagedResult<T>(results, rowsCount, currentPage, pageSize);
         }
 
         public async Task<T?> GetByIdAsync(int id)

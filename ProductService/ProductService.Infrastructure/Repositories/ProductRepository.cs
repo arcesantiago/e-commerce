@@ -1,5 +1,4 @@
-﻿using CleanArchitecture.Infrastructure.Repositories;
-using ProductService.Application.Contracts.Persistence;
+﻿using ProductService.Application.Contracts.Persistence;
 using ProductService.Domain;
 using ProductService.Infrastructure.Percistence;
 
