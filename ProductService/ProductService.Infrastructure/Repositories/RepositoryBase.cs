@@ -2,10 +2,10 @@
 using ProductService.Application.Contracts.Persistence;
 using ProductService.Application.Models;
 using ProductService.Domain.Common;
-using ProductService.Infrastucture.Percistence;
+using ProductService.Infrastructure.Percistence;
 using System.Linq.Expressions;
 
-namespace CleanArchitecture.Infrastucture.Repositories
+namespace CleanArchitecture.Infrastructure.Repositories
 {
     public class RepositoryBase<T> : IAsyncRepository<T> where T : BaseDomainModel
     {
@@ -83,13 +83,10 @@ namespace CleanArchitecture.Infrastucture.Repositories
 
             if (orderBy is not null) orderBy(query);
 
-            // Calcular cuántos registros saltar
             var skip = (currentPage - 1) * pageSize;
 
-            // Total de registros antes de paginar
             var rowsCount = await query.CountAsync();
 
-            // Aplicar paginado
             var results = await query
                 .Skip(skip)
                 .Take(pageSize)

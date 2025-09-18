@@ -7,16 +7,16 @@ using ProductService.Domain;
 
 namespace ProductService.Application.Features.Products.Commands.UpdateProduct
 {
-    public class UpdateProductCommandHanlder : IRequestHandler<UpdateProductCommand, Unit>
+    public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Unit>
     {
+        private readonly ILogger<UpdateProductCommandHandler> _logger;
         private readonly IMapper _mapper;
-        private readonly ILogger<UpdateProductCommandHanlder> _logger;
         private readonly IProductRepository _productRepository;
 
-        public UpdateProductCommandHanlder(IMapper mapper, ILogger<UpdateProductCommandHanlder> logger, IProductRepository productRepository)
+        public UpdateProductCommandHandler(ILogger<UpdateProductCommandHandler> logger, IMapper mapper, IProductRepository productRepository)
         {
-            _mapper = mapper;
             _logger = logger;
+            _mapper = mapper;
             _productRepository = productRepository;
         }
 
@@ -26,7 +26,7 @@ namespace ProductService.Application.Features.Products.Commands.UpdateProduct
 
             if (productToUpdate is null)
             {
-                _logger.LogError($"No se encontro el producto id {request.id}");
+                _logger.LogError($"Product id {request.id} not found");
                 throw new NotFoundException(nameof(Product), request.id);
             }
 
@@ -34,7 +34,7 @@ namespace ProductService.Application.Features.Products.Commands.UpdateProduct
 
             await _productRepository.UpdateAsync(productToUpdate);
 
-            _logger.LogInformation($"La operacion fue exitosa actualizando el producto {request.id}");
+            _logger.LogInformation($"The product {request.id} was updated successfully");
 
             return Unit.Value;
         }

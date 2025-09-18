@@ -25,6 +25,8 @@ namespace ProductService.Application.Features.Products.Commands.CreateProduct
 
             await _productRepository.AddAsync(productToAdd);
 
+            _logger.LogInformation($"The product {productToAdd.Id} was created successfully");
+
             return productToAdd.Id;
         }
     }

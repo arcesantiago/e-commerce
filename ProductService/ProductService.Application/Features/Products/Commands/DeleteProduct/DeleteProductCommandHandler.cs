@@ -23,13 +23,13 @@ namespace ProductService.Application.Features.Products.Commands.DeleteProduct
 
             if (productToDelete is null)
             {
-                _logger.LogError($"{request.id} producto no existe en el sistema");
+                _logger.LogError($"{request.id} product does not exist in the system");
                 throw new NotFoundException(nameof(Product), request.id);
             }
 
             await _productRepository.DeleteAsync(productToDelete);
 
-            _logger.LogInformation($"El {request.id} producto fue eliminado con exito");
+            _logger.LogInformation($"The product {request.id} was successfully removed");
 
             return Unit.Value;
         }

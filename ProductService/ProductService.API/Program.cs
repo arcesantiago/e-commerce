@@ -1,6 +1,6 @@
 using ProductService.API.Middleware;
 using ProductService.Application;
-using ProductService.Infrastucture;
+using ProductService.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddInfrastuctureServices(builder.Configuration);
+builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddAplicationServices();
 
 var app = builder.Build();
@@ -32,3 +32,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
