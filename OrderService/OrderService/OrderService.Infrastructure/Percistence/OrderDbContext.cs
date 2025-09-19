@@ -10,7 +10,7 @@ namespace OrderService.Infrastructure.Percistence
         {
 
         }
-        public DbSet<Order>? Products { get; set; }
+        public DbSet<Order>? Orders { get; set; }
         public DbSet<OrderItem>? OrderItems { get; set; }
 
 

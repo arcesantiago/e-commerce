@@ -32,7 +32,13 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
         public async Task Handle_ShouldCreateProduct_AndReturnId()
         {
             // Arrange
-            var command = new CreateProductCommand("Test Product", 100m, 5);
+            var command = new CreateProductCommand(new CreateProductCommandRequest
+            {
+                Description = "Test Product",
+                Price = 100m,
+                Stock = 5
+            });
+
             _productRepositoryMock
                 .Setup(r => r.AddAsync(It.IsAny<Product>()))
                 .ReturnsAsync((Product p) => { p.Id = 1; return p; });
@@ -52,10 +58,16 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
         }
 
         [Fact(DisplayName = "Handle should throw when price is invalid")]
-        public async Task Handle_ShouldThrow_WhenPriceInvalid()
+        public void Handle_ShouldThrow_WhenPriceInvalid()
         {
             // Arrange
-            var command = new CreateProductCommand("Invalid", 0m, 5);
+            var command = new CreateProductCommand(new CreateProductCommandRequest
+            {
+                Description = "Invalid",
+                Price = 0m,
+                Stock = 5
+            });
+
             var validator = new CreateProductCommandValidator();
 
             // Act
@@ -63,7 +75,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
 
             // Assert
             Assert.False(validationResult.IsValid);
-            Assert.Contains(validationResult.Errors, e => e.PropertyName == "price");
+            Assert.Contains(validationResult.Errors, e => e.PropertyName == "CreateProductCommandRequest.Price");
         }
     }
 }

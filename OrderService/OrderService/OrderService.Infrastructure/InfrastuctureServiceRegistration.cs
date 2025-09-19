@@ -6,6 +6,7 @@ using OrderService.Application.Behaviours;
 using OrderService.Application.Contracts.Persistence;
 using OrderService.Infrastructure.Percistence;
 using OrderService.Infrastructure.Repositories;
+using OrderService.Infrastructure.Services;
 
 namespace OrderService.Infrastructure
 {
@@ -23,6 +24,13 @@ namespace OrderService.Infrastructure
 
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+
+            services.AddHttpClient<IProductServiceClient, ProductServiceClient>(client =>
+            {
+                //client.BaseAddress = new Uri(configuration.GetConnectionString("https://localhost:44371")!);
+                client.BaseAddress = new Uri("https://localhost:44371");
+                client.Timeout = TimeSpan.FromSeconds(5);
+            });
 
             return services;
         }

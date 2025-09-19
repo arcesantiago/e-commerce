@@ -7,9 +7,9 @@ namespace ProductService.Application.Features.Products.Commands.UpdateProduct
     {
         public UpdateProductCommandValidator()
         {
-            RuleFor(p => p.description)
+            RuleFor(p => p.UpdateProductCommandRequest.Description)
                 .NotNull().WithMessage("{Description} no puede ser nulo");
-            RuleFor(p => p.price)
+            RuleFor(p => p.UpdateProductCommandRequest.Price)
                 .GreaterThan(0).WithMessage("{Price} debe ser positivo");
         }
     }

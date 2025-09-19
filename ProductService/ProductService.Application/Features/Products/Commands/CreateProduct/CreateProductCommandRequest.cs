@@ -1,8 +1,6 @@
-﻿using ProductService.Domain.Common;
-
-namespace ProductService.Domain
+﻿namespace ProductService.Application.Features.Products.Commands.CreateProduct
 {
-    public class Product : BaseDomainModel
+    public class CreateProductCommandRequest
     {
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }

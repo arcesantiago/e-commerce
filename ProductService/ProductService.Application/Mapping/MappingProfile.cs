@@ -15,8 +15,8 @@ namespace ProductService.Application.Mapping
             CreateMap<Product, ProductVm>();
             CreateMap<Product, PagedProductsListVm>();
             CreateMap<PagedResult<Product>, PagedResult<PagedProductsListVm>>();
-            CreateMap<CreateProductCommand, Product>();
-            CreateMap<UpdateProductCommand, Product>();
+            CreateMap<CreateProductCommandRequest, Product>();
+            CreateMap<UpdateProductCommandRequest, Product>();
         }
     }
 }

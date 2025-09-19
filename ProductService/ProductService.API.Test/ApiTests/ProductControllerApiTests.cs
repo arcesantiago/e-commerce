@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using ProductService.Application.Features.Products.Commands.CreateProduct;
+using ProductService.Application.Features.Products.Commands.UpdateProduct;
 using ProductService.Application.Features.Products.Queries.GetPagedProductsList;
 using ProductService.Application.Features.Products.Queries.GetProduct;
 using ProductService.Application.Models;
@@ -70,7 +72,7 @@ namespace ProductService.Api.Test.ApiTests
         [Fact(DisplayName = "POST /api/product creates product")]
         public async Task CreateProduct_ReturnsId()
         {
-            var cmd = new { description = "New Product", price = 50m, stock = 5 };
+            var cmd = new CreateProductCommandRequest { Description = "New Product", Price = 50m, Stock = 5 };
 
             var response = await _client.PostAsJsonAsync("/api/product", cmd);
 
@@ -86,7 +88,7 @@ namespace ProductService.Api.Test.ApiTests
         {
             SeedProduct(new Product { Id = 2, Description = "Old Name", Price = 10, Stock = 2 });
 
-            var cmd = new { id = 2, description = "Updated Name", price = 15m, stock = 5 };
+            var cmd = new UpdateProductCommandRequest { Id = 2, Description = "Updated Name", Price = 15m, Stock = 5 };
             var response = await _client.PutAsJsonAsync("/api/product", cmd);
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -98,7 +100,7 @@ namespace ProductService.Api.Test.ApiTests
         [Fact(DisplayName = "PUT /api/product returns NotFound when not exists")]
         public async Task UpdateProduct_ReturnsNotFound_WhenNotExists()
         {
-            var cmd = new { id = 999, description = "Does Not Exist", price = 15m, stock = 1 };
+            var cmd = new UpdateProductCommandRequest { Id = 999, Description = "Does Not Exist", Price = 15m, Stock = 1 };
             var response = await _client.PutAsJsonAsync("/api/product", cmd);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);

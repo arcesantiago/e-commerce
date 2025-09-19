@@ -1,8 +1,6 @@
-﻿using ProductService.Domain.Common;
-
-namespace ProductService.Domain
+﻿namespace OrderService.Application.Models
 {
-    public class Product : BaseDomainModel
+    public class ProductSnapshot
     {
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }

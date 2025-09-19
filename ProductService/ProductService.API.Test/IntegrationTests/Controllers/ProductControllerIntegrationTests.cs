@@ -99,7 +99,12 @@ namespace ProductService.Api.Test.IntegrationTests.Controllers
 
             var handler = new CreateProductCommandHandler(NullLogger<CreateProductCommandHandler>.Instance, mapper, repo);
 
-            var command = new CreateProductCommand("New Product", 50m, 3);
+            var command = new CreateProductCommand(new CreateProductCommandRequest
+            {
+                Description = "New Product",
+                Price = 50m,
+                Stock = 3
+            });
 
             var id = await handler.Handle(command, default);
 
@@ -109,27 +114,37 @@ namespace ProductService.Api.Test.IntegrationTests.Controllers
         }
 
         [Fact(DisplayName = "CreateProductCommand fails validation when price <= 0")]
-        public async Task CreateProductCommand_Throws_WhenPriceInvalid()
+        public void CreateProductCommand_Throws_WhenPriceInvalid()
         {
-            var command = new CreateProductCommand("Invalid Price", 0m, 3);
+            var command = new CreateProductCommand(new CreateProductCommandRequest
+            {
+                Description = "Invalid Price",
+                Price = 0m,
+                Stock = 3
+            });
 
             var validator = new CreateProductCommandValidator();
             var validationResult = validator.Validate(command);
 
             Assert.False(validationResult.IsValid);
-            Assert.Contains(validationResult.Errors, e => e.PropertyName == "price");
+            Assert.Contains(validationResult.Errors, e => e.PropertyName == "CreateProductCommandRequest.Price");
         }
 
         [Fact(DisplayName = "CreateProductCommand fails validation when description is null")]
-        public async Task CreateProductCommand_Throws_WhenDescriptionNull()
+        public void CreateProductCommand_Throws_WhenDescriptionNull()
         {
-            var command = new CreateProductCommand(null!, 10m, 3);
+            var command = new CreateProductCommand(new CreateProductCommandRequest
+            {
+                Description = null!,
+                Price = 10m,
+                Stock = 3
+            });
 
             var validator = new CreateProductCommandValidator();
             var validationResult = validator.Validate(command);
 
             Assert.False(validationResult.IsValid);
-            Assert.Contains(validationResult.Errors, e => e.PropertyName == "description");
+            Assert.Contains(validationResult.Errors, e => e.PropertyName == "CreateProductCommandRequest.Description");
         }
 
         // ---------- UPDATE ----------
@@ -141,12 +156,18 @@ namespace ProductService.Api.Test.IntegrationTests.Controllers
             var repo = new ProductRepository(context);
 
             var product = new Product { Description = "Old Name", Price = 10, Stock = 1 };
-            context.Products.Add(product);
+            context.Products!.Add(product);
             await context.SaveChangesAsync();
 
             var handler = new UpdateProductCommandHandler(NullLogger<UpdateProductCommandHandler>.Instance,mapper, repo);
 
-            var command = new UpdateProductCommand(id: product.Id, description: "Updated Name", price: 15m, stock: 2);
+            var command = new UpdateProductCommand(new UpdateProductCommandRequest
+            {
+                Id = product.Id,
+                Description = "Updated Name",
+                Price = 15m,
+                Stock = 2
+            });
 
             await handler.Handle(command, default);
 
@@ -163,21 +184,33 @@ namespace ProductService.Api.Test.IntegrationTests.Controllers
 
             var handler = new UpdateProductCommandHandler(NullLogger<UpdateProductCommandHandler>.Instance, mapper, repo);
 
-            var command = new UpdateProductCommand(id: 999, description: "Does Not Exist", price: 15m, stock: 1);
+            var command = new UpdateProductCommand(new UpdateProductCommandRequest
+            {
+                Id = 999,
+                Description = "Does Not Exist",
+                Price = 15m,
+                Stock = 1
+            });
 
             await Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command, default));
         }
 
         [Fact(DisplayName = "UpdateProductCommand fails validation when description is null")]
-        public async Task UpdateProductCommand_Throws_WhenDescriptionNull()
+        public void UpdateProductCommand_Throws_WhenDescriptionNull()
         {
-            var command = new UpdateProductCommand(id: 1, description: null!, price: 15m, stock: 1);
+            var command = new UpdateProductCommand(new UpdateProductCommandRequest
+            {
+                Id = 1,
+                Description = null!,
+                Price = 15m,
+                Stock = 1
+            });
 
             var validator = new UpdateProductCommandValidator();
             var validationResult = validator.Validate(command);
 
             Assert.False(validationResult.IsValid);
-            Assert.Contains(validationResult.Errors, e => e.PropertyName == "description");
+            Assert.Contains(validationResult.Errors, e => e.PropertyName == "UpdateProductCommandRequest.Description");
         }
 
         // ---------- DELETE ----------
@@ -188,7 +221,7 @@ namespace ProductService.Api.Test.IntegrationTests.Controllers
             var repo = new ProductRepository(context);
 
             var product = new Product { Description = "To Delete", Price = 10, Stock = 1 };
-            context.Products.Add(product);
+            context.Products!.Add(product);
             await context.SaveChangesAsync();
 
             var handler = new DeleteProductCommandHandler(NullLogger<DeleteProductCommandHandler>.Instance, repo);

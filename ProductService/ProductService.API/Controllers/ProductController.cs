@@ -29,7 +29,7 @@ namespace ProductService.API.Controllers
         [HttpGet("{id}", Name = "GetProduct")]
         [ProducesResponseType(typeof(ProductVm), (int)HttpStatusCode.OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ProductVm>> GetProduct([FromRoute]int id)
+        public async Task<ActionResult<ProductVm>> GetProduct([FromRoute] int id)
         {
             return Ok(await _mediator.Send(new GetProductQuery(id)));
         }
@@ -54,9 +54,9 @@ namespace ProductService.API.Controllers
         /// <returns></returns>
         [HttpPost(Name = "CreateProduct")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<int>> CreateProduct([FromBody] CreateProductCommand request)
+        public async Task<ActionResult<int>> CreateProduct([FromBody] CreateProductCommandRequest request)
         {
-            return Ok(await _mediator.Send(request));
+            return Ok(await _mediator.Send(new CreateProductCommand(request)));
         }
 
         /// <summary>
@@ -68,9 +68,9 @@ namespace ProductService.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult> UpdateProduct([FromBody] UpdateProductCommand request)
+        public async Task<ActionResult> UpdateProduct([FromBody] UpdateProductCommandRequest request)
         {
-            await _mediator.Send(request);
+            await _mediator.Send(new UpdateProductCommand(request));
 
             return NoContent();
         }

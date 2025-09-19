@@ -49,7 +49,13 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
                 _productRepositoryMock.Object
             );
 
-            var command = new UpdateProductCommand(1, "Updated Name", 15m, 5);
+            var command = new UpdateProductCommand( new UpdateProductCommandRequest
+            {
+                Id = 1,
+                Description = "Updated Name",
+                Price = 15m,
+                Stock = 5
+            });
 
             // Act
             var result = await handler.Handle(command, default);
@@ -76,7 +82,13 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
                 _productRepositoryMock.Object
             );
 
-            var command = new UpdateProductCommand(999, "Does Not Exist", 15m, 5);
+            var command = new UpdateProductCommand(new UpdateProductCommandRequest
+            {
+                Id = 999,
+                Description = "Does Not Exist",
+                Price = 15m,
+                Stock = 5
+            });
 
             // Act & Assert
             await Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command, default));
@@ -86,7 +98,14 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
         public void Validator_ShouldFail_WhenDescriptionIsNull()
         {
             // Arrange
-            var command = new UpdateProductCommand(1, null!, 15m, 5);
+            var command = new UpdateProductCommand(new UpdateProductCommandRequest
+            {
+                Id = 1,
+                Description = null!,
+                Price = 15m,
+                Stock = 5
+            });
+
             var validator = new UpdateProductCommandValidator();
 
             // Act
@@ -94,14 +113,21 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Contains(result.Errors, e => e.PropertyName == "description");
+            Assert.Contains(result.Errors, e => e.PropertyName == "UpdateProductCommandRequest.Description");
         }
 
         [Fact(DisplayName = "Validator should fail when price is less or equal to zero")]
         public void Validator_ShouldFail_WhenPriceInvalid()
         {
             // Arrange
-            var command = new UpdateProductCommand(1, "Valid Name", 0m, 5);
+            var command = new UpdateProductCommand(new UpdateProductCommandRequest
+            {
+                Id = 1,
+                Description = "Valid Name",
+                Price = 0m,
+                Stock = 5
+            });
+
             var validator = new UpdateProductCommandValidator();
 
             // Act
@@ -109,7 +135,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Contains(result.Errors, e => e.PropertyName == "price");
+            Assert.Contains(result.Errors, e => e.PropertyName == "UpdateProductCommandRequest.Price");
         }
     }
 }

@@ -18,7 +18,8 @@
                 400 => "El request enviado tiene errores",
                 401 => "No tiene autorizacion para este recurso",
                 404 => "No se encontro el recurso solicitado",
-                500 => "Se produjeron errores en el servidor"
+                500 => "Se produjeron errores en el servidor",
+                _ => throw new NotImplementedException(),
             };
         }
     }

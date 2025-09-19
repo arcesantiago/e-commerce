@@ -5,6 +5,8 @@ using ProductService.Application.Models;
 
 namespace ProductService.Application.Features.Products.Queries.GetPagedProductsList
 {
+    public record GetPagedProductsListQuery(int CurrentPage, int PageSize) : IRequest<PagedResult<PagedProductsListVm>>;
+
     public class GetPagedProductsListQueryHandler : IRequestHandler<GetPagedProductsListQuery, PagedResult<PagedProductsListVm>>
     {
         private readonly IMapper _mapper;
@@ -18,7 +20,7 @@ namespace ProductService.Application.Features.Products.Queries.GetPagedProductsL
 
         public async Task<PagedResult<PagedProductsListVm>> Handle(GetPagedProductsListQuery request, CancellationToken cancellationToken)
         {
-            var results = await _productRepository.GetPaginatedAsync(request.currentPage, request.pageSize);
+            var results = await _productRepository.GetPaginatedAsync(request.CurrentPage, request.PageSize);
 
             return _mapper.Map<PagedResult<PagedProductsListVm>>(results);
         }
