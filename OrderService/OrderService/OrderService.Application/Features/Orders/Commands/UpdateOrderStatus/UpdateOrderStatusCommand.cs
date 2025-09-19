@@ -5,7 +5,7 @@ using OrderService.Application.Exceptions;
 using OrderService.Domain;
 using OrderService.Domain.Enums;
 
-namespace OrderService.Application.Features.Commands.UpdateOrderStatus
+namespace OrderService.Application.Features.Orders.Commands.UpdateOrderStatus
 {
     public record UpdateOrderStatusCommand(int Id, OrderStatus Status) : IRequest<bool>;
     public class UpdateOrderStatusCommandHandler : IRequestHandler<UpdateOrderStatusCommand, bool>

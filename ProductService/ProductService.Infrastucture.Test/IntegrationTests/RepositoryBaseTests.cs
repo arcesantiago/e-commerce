@@ -4,7 +4,7 @@ using ProductService.Infrastructure.Percistence;
 using ProductService.Infrastructure.Repositories;
 using System.Linq.Expressions;
 
-namespace ProductService.Infrastucture.Test.IntegrationTests
+namespace ProductService.Infrastructure.Test.IntegrationTests
 {
     public class RepositoryBaseTests
     {

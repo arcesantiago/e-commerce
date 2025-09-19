@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using OrderService.Application.Features.Commands.CreateOrder;
-using OrderService.Application.Features.Commands.UpdateOrderStatus;
-using OrderService.Application.Features.Queries.GetOrder;
-using OrderService.Application.Features.Queries.GetOrders;
+using OrderService.Application.Features.Orders.Commands.CreateOrder;
+using OrderService.Application.Features.Orders.Commands.UpdateOrderStatus;
+using OrderService.Application.Features.Orders.Queries.GetOrder;
+using OrderService.Application.Features.Orders.Queries.GetOrders;
 using System.Net;
 
 namespace OrderService.API.Controllers

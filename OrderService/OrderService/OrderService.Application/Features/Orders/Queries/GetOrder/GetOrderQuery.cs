@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using MediatR;
 using OrderService.Application.Contracts.Persistence;
+using OrderService.Application.Exceptions;
+using OrderService.Domain;
 
-namespace OrderService.Application.Features.Queries.GetOrder
+namespace OrderService.Application.Features.Orders.Queries.GetOrder
 {
     public record GetOrderQuery(int Id) : IRequest<OrderVm>;
     public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderQuery, OrderVm>
@@ -20,6 +22,10 @@ namespace OrderService.Application.Features.Queries.GetOrder
         public async Task<OrderVm> Handle(GetOrderQuery request, CancellationToken cancellationToken)
         {
             var order = await _repository.GetByIdWithDetailsAsync(request.Id);
+
+            if (order is null)
+                throw new NotFoundException(nameof(Order), request.Id);
+
             return _mapper.Map<OrderVm>(order);
         }
     }

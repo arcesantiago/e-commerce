@@ -1,4 +1,4 @@
-﻿namespace OrderService.Application.Features.Commands.CreateOrder
+﻿namespace OrderService.Application.Features.Orders.Commands.CreateOrder
 {
     public class CreateOrderCommandRequest
     {

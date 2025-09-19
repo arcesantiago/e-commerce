@@ -91,7 +91,8 @@ namespace OrderService.Infrastructure.Migrations
                 {
                     b.HasOne("OrderService.Domain.Order", null)
                         .WithMany("Items")
-                        .HasForeignKey("OrderId");
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("OrderService.Domain.Order", b =>

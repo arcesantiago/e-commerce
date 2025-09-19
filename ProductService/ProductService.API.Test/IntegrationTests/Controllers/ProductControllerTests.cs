@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using ProductService.API.Test.IntegrationTests;
 using ProductService.Application.Features.Products.Commands.CreateProduct;
 using ProductService.Application.Features.Products.Commands.UpdateProduct;
 using ProductService.Application.Features.Products.Queries.GetPagedProductsList;
@@ -9,14 +10,14 @@ using ProductService.Infrastructure.Percistence;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace ProductService.Api.Test.ApiTests
+namespace ProductService.API.Test.IntegrationTests.Controllers
 {
-    public class ProductControllerApiTests : IClassFixture<CustomWebApplicationFactory>
+    public class ProductControllerTests : IClassFixture<CustomWebApplicationFactory>
     {
         private readonly CustomWebApplicationFactory _factory;
         private readonly HttpClient _client;
 
-        public ProductControllerApiTests(CustomWebApplicationFactory factory)
+        public ProductControllerTests(CustomWebApplicationFactory factory)
         {
             _factory = factory;
             _client = factory.CreateClient();
@@ -110,12 +111,12 @@ namespace ProductService.Api.Test.ApiTests
         [Fact(DisplayName = "DELETE /api/product/{id} deletes existing product")]
         public async Task DeleteProduct_ReturnsNoContent_WhenExists()
         {
-            SeedProduct(new Product { Id = 3, Description = "To Delete", Price = 10, Stock = 1 });
+            SeedProduct(new Product { Id = 5, Description = "To Delete", Price = 10, Stock = 1 });
 
-            var response = await _client.DeleteAsync("/api/product/3");
+            var response = await _client.DeleteAsync("/api/product/5");
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-            var getResponse = await _client.GetAsync("/api/product/3");
+            var getResponse = await _client.GetAsync("/api/product/5");
             Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
         }
 

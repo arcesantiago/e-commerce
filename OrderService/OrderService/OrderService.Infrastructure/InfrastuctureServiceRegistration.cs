@@ -22,13 +22,11 @@ namespace OrderService.Infrastructure
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 
-
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
             services.AddHttpClient<IProductServiceClient, ProductServiceClient>(client =>
             {
-                //client.BaseAddress = new Uri(configuration.GetConnectionString("https://localhost:44371")!);
-                client.BaseAddress = new Uri("https://localhost:44371");
+                client.BaseAddress = new Uri(configuration["Services:ProductClient"]);
                 client.Timeout = TimeSpan.FromSeconds(5);
             });
 

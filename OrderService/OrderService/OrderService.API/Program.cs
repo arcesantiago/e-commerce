@@ -1,6 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using OrderService.API.Middleware;
 using OrderService.Application;
 using OrderService.Infrastructure;
+using OrderService.Infrastructure.Percistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +13,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Configuration
+    .AddJsonFile($"appsettings.json")
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
+    .Build();
+
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddAplicationServices();
+
 
 var app = builder.Build();
 
@@ -35,3 +43,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

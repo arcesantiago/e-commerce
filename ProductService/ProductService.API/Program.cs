@@ -1,6 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using ProductService.API.Middleware;
 using ProductService.Application;
 using ProductService.Infrastructure;
+using ProductService.Infrastructure.Percistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddAplicationServices();
+
+builder.Configuration
+    .AddJsonFile($"appsettings.json")
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
+    .Build();
 
 var app = builder.Build();
 

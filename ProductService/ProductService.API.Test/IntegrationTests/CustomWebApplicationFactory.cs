@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using ProductService.Domain;
 using ProductService.Infrastructure.Percistence;
 
-namespace ProductService.Api.Test.ApiTests
+namespace ProductService.API.Test.IntegrationTests
 {
     public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {

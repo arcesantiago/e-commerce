@@ -6,7 +6,7 @@ using OrderService.Domain;
 using OrderService.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace OrderService.Application.Features.Commands.CreateOrder
+namespace OrderService.Application.Features.Orders.Commands.CreateOrder
 {
     public record CreateOrderCommand(CreateOrderCommandRequest CreateOrderCommandRequest) : IRequest<int>;
     public class CreateOrderCommandHandler(ILogger<CreateOrderCommandHandler> logger, IMapper mapper, IOrderRepository repository, IProductServiceClient productServiceClient) : IRequestHandler<CreateOrderCommand, int>

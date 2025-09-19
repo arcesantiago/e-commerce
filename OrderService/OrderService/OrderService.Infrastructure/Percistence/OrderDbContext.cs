@@ -13,7 +13,16 @@ namespace OrderService.Infrastructure.Percistence
         public DbSet<Order>? Orders { get; set; }
         public DbSet<OrderItem>? OrderItems { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
 
+            // Relación Order → OrderItems con eliminación en cascada
+            modelBuilder.Entity<Order>()
+                .HasMany(o => o.Items)
+                .WithOne() // sin navegación inversa
+                .OnDelete(DeleteBehavior.Cascade);
+        }
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             foreach (var entry in ChangeTracker.Entries<BaseDomainModel>())

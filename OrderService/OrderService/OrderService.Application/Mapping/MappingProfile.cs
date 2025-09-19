@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using OrderService.Application.Features.Commands.CreateOrder;
-using OrderService.Application.Features.Queries.GetOrder;
-using OrderService.Application.Features.Queries.GetOrders;
+using OrderService.Application.Features.Orders.Commands.CreateOrder;
+using OrderService.Application.Features.Orders.Queries.GetOrder;
+using OrderService.Application.Features.Orders.Queries.GetOrders;
 using OrderService.Domain;
 
 namespace OrderService.Application.Mapping

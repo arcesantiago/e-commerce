@@ -12,7 +12,7 @@ using OrderService.Infrastructure.Percistence;
 namespace OrderService.Infrastructure.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20250918185347_InitialMigration")]
+    [Migration("20250919215907_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -94,7 +94,8 @@ namespace OrderService.Infrastructure.Migrations
                 {
                     b.HasOne("OrderService.Domain.Order", null)
                         .WithMany("Items")
-                        .HasForeignKey("OrderId");
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("OrderService.Domain.Order", b =>
