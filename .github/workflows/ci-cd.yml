@@ -1,0 +1,44 @@
+name: CI/CD - E-Commerce Microservices
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+
+    - name: Instalar .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restaurar dependencias ProductService
+      run: dotnet restore ProductService/ProductService.API/ProductService.API.csproj
+
+    - name: Compilar ProductService
+      run: dotnet build ProductService/ProductService.API/ProductService.API.csproj --configuration Release
+
+    - name: Testear ProductService
+      run: dotnet test ProductService/ProductService.Tests/ProductService.Tests.csproj
+
+    - name: Restaurar dependencias OrderService
+      run: dotnet restore OrderService/OrderService.API/OrderService.API.csproj
+
+    - name: Compilar OrderService
+      run: dotnet build OrderService/OrderService.API/OrderService.API.csproj --configuration Release
+
+    - name: Testear OrderService
+      run: dotnet test OrderService/OrderService.Tests/OrderService.Tests.csproj
+
+    - name: Construir imagen ProductService
+      run: docker build -t productserviceapi ./ProductService
+
+    - name: Construir imagen OrderService
+      run: docker build -t orderserviceapi ./OrderService
