@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using ProductService.API.Middleware;
-using ProductService.Application;
-using ProductService.Infrastructure;
-using ProductService.Infrastructure.Percistence;
+using OrderService.API.Middleware;
+using OrderService.Application;
+using OrderService.Infrastructure;
+using OrderService.Infrastructure.Percistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +13,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Configuration
+    .AddJsonFile($"appsettings.json")
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
+    .Build();
+
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddAplicationServices();
 
@@ -21,11 +26,6 @@ builder.Services.AddHealthChecks()
         connectionString: builder.Configuration.GetConnectionString("DefaultConnection")!,
         name: "sqlserver",
         tags: new[] { "db", "sql" });
-
-builder.Configuration
-    .AddJsonFile($"appsettings.json")
-    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
-    .Build();
 
 var app = builder.Build();
 
@@ -41,10 +41,10 @@ if (!app.Environment.IsProduction())
 
 if (!app.Environment.IsDevelopment())
     using (var scope = app.Services.CreateScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
-        await db.Database.MigrateAsync();
-    }
+{
+    var db = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 app.UseMiddleware<ExceptionMiddleware>();
 

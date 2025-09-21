@@ -13,7 +13,7 @@ namespace ProductService.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ProductDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("ConnectionString"))
+            services.AddDbContext<ProductDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
                 .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, Microsoft.Extensions.Logging.LogLevel.Information)
                 .EnableSensitiveDataLogging());
 
