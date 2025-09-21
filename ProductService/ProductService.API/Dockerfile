@@ -12,13 +12,13 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ProductService/ProductService.API/ProductService.API.csproj", "ProductService.API/"]
-COPY ["ProductService/ProductService.Application/ProductService.Application.csproj", "ProductService.Application/"]
-COPY ["ProductService/ProductService.Domain/ProductService.Domain.csproj", "ProductService.Domain/"]
-COPY ["ProductService/ProductService.Infrastructure/ProductService.Infrastructure.csproj", "ProductService.Infrastructure/"]
-RUN dotnet restore "./ProductService.API/ProductService.API.csproj"
+COPY ["ProductService/ProductService.API/ProductService.API.csproj", "ProductService/ProductService.API/"]
+COPY ["ProductService/ProductService.Application/ProductService.Application.csproj", "ProductService/ProductService.Application/"]
+COPY ["ProductService/ProductService.Domain/ProductService.Domain.csproj", "ProductService/ProductService.Domain/"]
+COPY ["ProductService/ProductService.Infrastructure/ProductService.Infrastructure.csproj", "ProductService/ProductService.Infrastructure/"]
+RUN dotnet restore "./ProductService/ProductService.API/ProductService.API.csproj"
 COPY . .
-WORKDIR "ProductService/src/ProductService.API"
+WORKDIR "/src/ProductService/ProductService.API"
 RUN dotnet build "./ProductService.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage

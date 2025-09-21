@@ -3,8 +3,8 @@ services:
   productservice.api:
     image: productserviceapi
     build:
-      context: ./ProductService
-      dockerfile: ProductService.API/Dockerfile
+      context: .
+      dockerfile: ProductService/ProductService.API/Dockerfile
     container_name: productservice.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Testing
@@ -20,8 +20,8 @@ services:
   orderservice.api:
     image: orderserviceapi
     build:
-      context: ./OrderService
-      dockerfile: OrderService.API/Dockerfile
+      context: .
+      dockerfile: OrderService/OrderService.API/Dockerfile
     container_name: orderservice.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Testing
