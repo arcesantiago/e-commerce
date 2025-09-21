@@ -2,6 +2,7 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -17,7 +18,7 @@ COPY ["ProductService/ProductService.Domain/ProductService.Domain.csproj", "Prod
 COPY ["ProductService/ProductService.Infrastructure/ProductService.Infrastructure.csproj", "ProductService.Infrastructure/"]
 RUN dotnet restore "./ProductService.API/ProductService.API.csproj"
 COPY . .
-WORKDIR "/src/ProductService.API"
+WORKDIR "ProductService/src/ProductService.API"
 RUN dotnet build "./ProductService.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
