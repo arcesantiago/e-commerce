@@ -19,19 +19,21 @@ Incluye dos servicios principales:
 
 git clone https://github.com/arcesantiago/e-commerce.git
 cd e-commerce
-3. Levantar el entorno con Docker Compose
+### 3. Levantar el entorno con Docker Compose
 
 bash
 docker-compose up --build
 Esto construirá las imágenes de ProductService, OrderService y levantará un contenedor de SQL Server.
 
-4. Acceso a los servicios
+### 4. Acceso a los servicios
 
 ProductService API → http://localhost:8082/swagger
 
 OrderService API → http://localhost:8081/swagger
 
 SQL Server → localhost,1433 (usuario: sa, contraseña: Your_strong!Passw0rd)
+
+---
 
 🏗 Arquitectura del sistema
 
@@ -59,6 +61,8 @@ Orquestación: docker-compose.yml unificado en la raíz.
 
 Testing: proyectos de test separados por capa (API.Test, Application.Test, Infrastructure.Test).
 
+---
+
 ⚙️ Decisiones técnicas tomadas
 
 .NET 8 + Clean Architecture Separación en capas (API, Application, Domain, Infrastructure) para favorecer mantenibilidad y escalabilidad.
@@ -78,6 +82,8 @@ Restaurar, compilar y testear cada microservicio.
 Construir imágenes Docker listas para despliegue.
 
 Uso de Microsoft Copilot Copilot se utilizó para asistir en la generación de documentación, estructuración de instrucciones y optimización de configuraciones de CI/CD.
+
+---
 
 📬 Colección de Postman / Documentación de API
 
