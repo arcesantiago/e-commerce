@@ -12,10 +12,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ProductService.API/ProductService.API.csproj", "ProductService.API/"]
-COPY ["ProductService.Application/ProductService.Application.csproj", "ProductService.Application/"]
-COPY ["ProductService.Domain/ProductService.Domain.csproj", "ProductService.Domain/"]
-COPY ["ProductService.Infrastructure/ProductService.Infrastructure.csproj", "ProductService.Infrastructure/"]
+COPY ["ProductService/ProductService.API/ProductService.API.csproj", "ProductService.API/"]
+COPY ["ProductService/ProductService.Application/ProductService.Application.csproj", "ProductService.Application/"]
+COPY ["ProductService/ProductService.Domain/ProductService.Domain.csproj", "ProductService.Domain/"]
+COPY ["ProductService/ProductService.Infrastructure/ProductService.Infrastructure.csproj", "ProductService.Infrastructure/"]
 RUN dotnet restore "./ProductService.API/ProductService.API.csproj"
 COPY . .
 WORKDIR "/src/ProductService.API"
