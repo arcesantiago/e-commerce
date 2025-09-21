@@ -1,0 +1,56 @@
+name: CI/CD - E-Commerce Microservices
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+
+    - name: Instalar .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restaurar dependencias ProductService
+      run: dotnet restore ProductService/ProductService.API/ProductService.API.csproj
+
+    - name: Compilar ProductService
+      run: dotnet build ProductService/ProductService.API/ProductService.API.csproj --configuration Release
+
+    - name: Testear ProductService.API
+      run: dotnet test ProductService/ProductService.API.Test/ProductService.API.Test.csproj
+    
+    - name: Testear ProductService.Application
+      run: dotnet test ProductService/ProductService.Application.Test/ProductService.Application.Test.csproj
+    
+    - name: Testear ProductService.Infrastructure
+      run: dotnet test ProductService/ProductService.Infrastructure.Test/ProductService.Infrastructure.Test.csproj
+
+    - name: Restaurar dependencias OrderService
+      run: dotnet restore OrderService/OrderService.API/OrderService.API.csproj
+
+    - name: Compilar OrderService
+      run: dotnet build OrderService/OrderService.API/OrderService.API.csproj --configuration Release
+
+    - name: Testear OrderService.API
+      run: dotnet test OrderService/OrderService.API.Test/OrderService.API.Test.csproj
+    
+    - name: Testear OrderService.Application
+      run: dotnet test OrderService/OrderService.Application.Test/OrderService.Application.Test.csproj
+    
+    - name: Testear OrderService.Infrastructure
+      run: dotnet test OrderService/OrderService.Infrastructure.Test/OrderService.Infrastructure.Test.csproj
+
+    - name: Construir imagen ProductService
+      run: docker build -t productserviceapi ./ProductService
+
+    - name: Construir imagen OrderService
+      run: docker build -t orderserviceapi ./OrderService
