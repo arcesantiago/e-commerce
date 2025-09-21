@@ -53,4 +53,4 @@ jobs:
       run: docker build -t productserviceapi -f ProductService/ProductService.API/Dockerfile .
 
     - name: Construir imagen OrderService
-      run: docker build -t orderserviceapi ./OrderService/OrderService.API
+      run: docker build -t orderserviceapi -f OrderService/OrderService.API/Dockerfile .
