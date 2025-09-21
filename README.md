@@ -16,14 +16,17 @@ Incluye dos servicios principales:
 - [Docker Compose](https://docs.docker.com/compose/)
 
 ### 2. Clonar el repositorio
+
 git clone https://github.com/arcesantiago/e-commerce.git
 cd e-commerce
 3. Levantar el entorno con Docker Compose
+
 bash
 docker-compose up --build
 Esto construirá las imágenes de ProductService, OrderService y levantará un contenedor de SQL Server.
 
 4. Acceso a los servicios
+5. 
 ProductService API → http://localhost:8082/swagger
 
 OrderService API → http://localhost:8081/swagger
@@ -31,6 +34,7 @@ OrderService API → http://localhost:8081/swagger
 SQL Server → localhost,1433 (usuario: sa, contraseña: Your_strong!Passw0rd)
 
 🏗 Arquitectura del sistema
+
                 ┌──────────────────┐
                 │   ProductService  │
                 │  (.NET 8, API)    │
@@ -44,6 +48,7 @@ SQL Server → localhost,1433 (usuario: sa, contraseña: Your_strong!Passw0rd)
                 ┌─────────▼────────┐
                 │   SQL Server DB   │
                 └───────────────────┘
+                
 Microservicios independientes: cada uno con su propio Dockerfile y pruebas unitarias.
 
 Comunicación: HTTP/REST.
