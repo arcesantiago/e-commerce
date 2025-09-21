@@ -32,7 +32,7 @@ jobs:
       run: dotnet test ProductService/ProductService.Application.Test/ProductService.Application.Test.csproj
     
     - name: Testear ProductService.Infrastructure
-      run: dotnet test ProductService/ProductService.Infrastucture.Test/ProductService.Infrastucture.Test.csproj
+      run: dotnet test ProductService/ProductService.Infrastructure.Test/ProductService.Infrastructure.Test.csproj
 
     - name: Restaurar dependencias OrderService
       run: dotnet restore OrderService/OrderService.API/OrderService.API.csproj
