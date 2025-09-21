@@ -50,7 +50,7 @@ jobs:
       run: dotnet test OrderService/OrderService.Infrastructure.Test/OrderService.Infrastructure.Test.csproj
 
     - name: Construir imagen ProductService
-      run: docker build -t productserviceapi ./ProductService/ProductService.API
+      run: docker build -t productserviceapi -f ProductService/ProductService.API/Dockerfile .
 
     - name: Construir imagen OrderService
       run: docker build -t orderserviceapi ./OrderService/OrderService.API
