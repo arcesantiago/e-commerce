@@ -26,7 +26,7 @@ docker-compose up --build
 Esto construirá las imágenes de ProductService, OrderService y levantará un contenedor de SQL Server.
 
 4. Acceso a los servicios
-5. 
+
 ProductService API → http://localhost:8082/swagger
 
 OrderService API → http://localhost:8081/swagger
@@ -94,24 +94,6 @@ Documentación Swagger: Cada microservicio expone su propia documentación inter
 ProductService → /swagger
 
 OrderService → /swagger
-
-📂 Estructura del repositorio
-
-e-commerce/
-├── ProductService/
-│   ├── ProductService.API/
-│   ├── ProductService.Application/
-│   ├── ProductService.Domain/
-│   ├── ProductService.Infrastructure/
-│   └── Tests...
-├── OrderService/
-│   ├── OrderService.API/
-│   ├── OrderService.Application/
-│   ├── OrderService.Domain/
-│   ├── OrderService.Infrastructure/
-│   └── Tests...
-├── docker-compose.yml
-└── README.md
 
 🧪 Ejecución de tests
 
