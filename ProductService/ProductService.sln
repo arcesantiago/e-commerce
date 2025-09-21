@@ -33,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductService.Infrastructure.Test", "ProductService.Infrastucture.Test\ProductService.Infrastructure.Test.csproj", "{F49F3EAC-9996-0ABB-904B-5A184C595215}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductService.Infrastructure.Test", "ProductService.Infrastructure.Test\ProductService.Infrastructure.Test.csproj", "{F49F3EAC-9996-0ABB-904B-5A184C595215}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
