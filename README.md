@@ -83,7 +83,7 @@ DELETE /api/products/{id} → Eliminar producto.
 
 Modelo:
 
-csharp
+
 public class Product {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -93,6 +93,7 @@ public class Product {
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
+
 Order Service
 GET /api/orders → Listar pedidos.
 
@@ -104,7 +105,7 @@ PUT /api/orders/{id}/status → Actualizar estado del pedido.
 
 Modelo:
 
-csharp
+
 public class Order {
     public int Id { get; set; }
     public string CustomerId { get; set; }
