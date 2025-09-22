@@ -23,7 +23,7 @@ Este repositorio contiene la solución desarrollada para la prueba técnica, cum
 
 ### 2. Clonar el repositorio
 
-git clone https://github.com/<usuario>/<repositorio>.git
+git clone https://github.com/arcesantiago/e-commerce.git
 cd e-commerce
 ### 3. Levantar el entorno con Docker Compose
 
