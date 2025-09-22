@@ -2,6 +2,7 @@
 using OrderService.Application.Features.Orders.Commands.CreateOrder;
 using OrderService.Application.Features.Orders.Commands.UpdateOrderStatus;
 using OrderService.Application.Features.Orders.Queries.GetOrder;
+using OrderService.Domain.Enums;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -39,7 +40,7 @@ namespace OrderService.API.Test.IntegrationTests
         [Fact]
         public async Task UpdateOrderStatus_ShouldReturnNoContent_WhenSuccess()
         {
-            var command = new UpdateOrderStatusCommand(1, Domain.Enums.OrderStatus.Confirmed);
+            var command = new UpdateOrderStatusCommand(1, OrderStatus.Confirmed);
 
             var response = await _client.PutAsJsonAsync("/api/orders", command);
 
@@ -49,7 +50,7 @@ namespace OrderService.API.Test.IntegrationTests
         [Fact]
         public async Task UpdateOrderStatus_ShouldReturnNotFound_WhenNotExists()
         {
-            var command = new UpdateOrderStatusCommand(4, Domain.Enums.OrderStatus.Confirmed);
+            var command = new UpdateOrderStatusCommand(7, OrderStatus.Confirmed);
 
             var response = await _client.PutAsJsonAsync("/api/orders", command);
 

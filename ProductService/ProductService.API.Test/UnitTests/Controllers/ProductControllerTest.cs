@@ -14,12 +14,12 @@ namespace ProductService.API.Test.UnitTests.Controllers
     public class ProductControllerUnitTests
     {
         private readonly Mock<IMediator> _mediatorMock;
-        private readonly ProductController _controller;
+        private readonly ProductsController _controller;
 
         public ProductControllerUnitTests()
         {
             _mediatorMock = new Mock<IMediator>();
-            _controller = new ProductController(_mediatorMock.Object);
+            _controller = new ProductsController(_mediatorMock.Object);
         }
 
         [Fact]

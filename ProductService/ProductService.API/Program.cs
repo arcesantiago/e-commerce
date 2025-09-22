@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ProductService.API.Middleware;
 using ProductService.Application;
 using ProductService.Infrastructure;
+using ProductService.Infrastructure.Data;
 using ProductService.Infrastructure.Percistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,12 +40,16 @@ if (!app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-if (!app.Environment.IsDevelopment())
-    using (var scope = app.Services.CreateScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
-        await db.Database.MigrateAsync();
-    }
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
+
+    if (!app.Environment.IsDevelopment())
+    await db.Database.MigrateAsync();
+
+    DbInitializer.Seed(db);
+}
+
 
 app.UseMiddleware<ExceptionMiddleware>();
 

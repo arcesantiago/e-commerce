@@ -11,7 +11,7 @@ namespace ProductService.Infrastructure.Test.IntegrationTests
         private ProductDbContext CreateDbContext()
         {
             var options = new DbContextOptionsBuilder<ProductDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString()) // DB única por test
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
 
             return new ProductDbContext(options);
@@ -88,7 +88,6 @@ namespace ProductService.Infrastructure.Test.IntegrationTests
             using var context = CreateDbContext();
             var repo = new RepositoryBase<Product>(context);
 
-            // Aquí podrías agregar entidades relacionadas si Product tiene navegación
             var product = new Product { Description = "WithIncludes", Price = 10, Stock = 1 };
             context.Products!.Add(product);
             await context.SaveChangesAsync();

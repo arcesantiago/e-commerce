@@ -17,10 +17,9 @@ namespace OrderService.Infrastructure.Percistence
         {
             base.OnModelCreating(modelBuilder);
 
-            // Relación Order → OrderItems con eliminación en cascada
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.Items)
-                .WithOne() // sin navegación inversa
+                .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
         }
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

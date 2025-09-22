@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using OrderService.API.Middleware;
 using OrderService.Application;
 using OrderService.Infrastructure;
+using OrderService.Infrastructure.Data;
 using OrderService.Infrastructure.Percistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,11 +40,14 @@ if (!app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-if (!app.Environment.IsDevelopment())
-    using (var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
-    await db.Database.MigrateAsync();
+
+    if (!app.Environment.IsDevelopment())
+        await db.Database.MigrateAsync();
+
+    DbInitializer.Seed(db);
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
