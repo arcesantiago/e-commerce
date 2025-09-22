@@ -26,8 +26,9 @@ Este repositorio contiene la solución desarrollada para la prueba técnica, cum
 git clone https://github.com/<usuario>/<repositorio>.git
 cd e-commerce
 ### 3. Levantar el entorno con Docker Compose
-bash
+
 docker-compose up --build
+
 Esto construirá las imágenes de ProductService, OrderService y levantará un contenedor de SQL Server con datos iniciales (seed).
 
 ### 4. Acceso a los servicios
