@@ -41,12 +41,12 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
 
             _productRepositoryMock
                 .Setup(r => r.GetPaginatedAsync(
-                    1,
-                    10,
-                    It.IsAny<Expression<Func<Product, bool>>>(),   // predicate
-                    It.IsAny<Func<IQueryable<Product>, IOrderedQueryable<Product>>>(), // orderBy
-                    It.IsAny<List<Expression<Func<Product, object>>>>(), // includes
-                    true // disableTracking
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<Expression<Func<Product, bool>>>(),
+                    It.IsAny<Func<IQueryable<Product>, IOrderedQueryable<Product>>>(),
+                    It.IsAny<List<Expression<Func<Product, object>>>>(),
+                    It.IsAny<bool>()
                 ))
                 .ReturnsAsync(pagedProducts);
 
@@ -72,12 +72,12 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
 
             _productRepositoryMock
                 .Setup(r => r.GetPaginatedAsync(
-                    1,
-                    10,
-                    It.IsAny<Expression<Func<Product, bool>>>(),   // predicate
-                    It.IsAny<Func<IQueryable<Product>, IOrderedQueryable<Product>>>(), // orderBy
-                    It.IsAny<List<Expression<Func<Product, object>>>>(), // includes
-                    true // disableTracking
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<Expression<Func<Product, bool>>>(),
+                    It.IsAny<Func<IQueryable<Product>, IOrderedQueryable<Product>>>(),
+                    It.IsAny<List<Expression<Func<Product, object>>>>(),
+                    It.IsAny<bool>()
                 ))
                 .ReturnsAsync(pagedProducts);
 

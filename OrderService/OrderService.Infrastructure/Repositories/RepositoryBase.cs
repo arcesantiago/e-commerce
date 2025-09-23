@@ -75,6 +75,17 @@ namespace OrderService.Infrastructure.Repositories
             return await _context.Set<T>().FindAsync(id);
         }
 
+        public async Task<T?> GetByAsync(Expression<Func<T, bool>> predicate, List<Expression<Func<T, object>>>? includes = null, bool disableTracking = true)
+        {
+            IQueryable<T> query = _context.Set<T>();
+
+            if (disableTracking) query = query.AsNoTracking();
+
+            if (includes is not null) query = includes.Aggregate(query, (current, include) => current.Include(include));
+
+            return await query.FirstOrDefaultAsync(predicate);
+        }
+
         public async Task<T> UpdateAsync(T entity)
         {
             _context.Entry(entity).State = EntityState.Modified;

@@ -30,5 +30,11 @@ namespace ProductService.Application.Contracts.Persistence
         Task<T> AddAsync(T entity);
         Task<T> UpdateAsync(T entity);
         Task DeleteAsync(T entity);
+
+        Task<T?> GetByAsync(
+            Expression<Func<T, bool>> predicate
+            , List<Expression<Func<T, object>>>? includes = null
+            , bool disableTracking = true
+        );
     }
 }

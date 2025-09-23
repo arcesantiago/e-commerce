@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Castle.Core.Resource;
+using Microsoft.EntityFrameworkCore;
 using OrderService.Domain;
 using OrderService.Domain.Enums;
 using OrderService.Infrastructure.Percistence;
@@ -133,6 +134,17 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
 
             Assert.Empty(_context.Orders!);
             Assert.Empty(_context!.Set<OrderItem>());
+        }
+
+        [Fact]
+        public async Task GetByAsync_WithPredicateAndIncludes_ReturnsEntityWithNavigation()
+        {
+            var order = await SeedOrderAsync();
+
+            var result = await _repository.GetByAsync(o => o.Id == 1, new() { x => x.Items });
+
+            Assert.NotNull(result);
+            Assert.Equal(order.CustomerId, result!.CustomerId);
         }
 
         private async Task<Order> SeedOrderAsync(string customerId = "CUST-1")
