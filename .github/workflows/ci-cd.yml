@@ -8,49 +8,76 @@ on:
 
 jobs:
   build-test:
+    name: Build & Test (Microservices)
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout código
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Instalar .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
 
-    - name: Restaurar dependencias ProductService
-      run: dotnet restore ProductService/ProductService.API/ProductService.API.csproj
+      - name: Ejecutar Tests para toda la solución (asume que existe un .sln)
+        run: dotnet test --configuration Release --verbosity normal
 
-    - name: Compilar ProductService
-      run: dotnet build ProductService/ProductService.API/ProductService.API.csproj --configuration Release
+      - name: Configurar variables de tag
+        id: vars
+        run: echo "SHA_TAG=$(echo $GITHUB_SHA | cut -c1-8)" >> $GITHUB_OUTPUT
+        
+      - name: Construir y Taggear ProductService
+        run: |
+          docker build -t productserviceapi:${{ steps.vars.outputs.SHA_TAG }} -f ProductService/ProductService.API/Dockerfile .
 
-    - name: Testear ProductService.API
-      run: dotnet test ProductService/ProductService.API.Test/ProductService.API.Test.csproj
-    
-    - name: Testear ProductService.Application
-      run: dotnet test ProductService/ProductService.Application.Test/ProductService.Application.Test.csproj
-    
-    - name: Testear ProductService.Infrastructure
-      run: dotnet test ProductService/ProductService.Infrastructure.Test/ProductService.Infrastructure.Test.csproj
+      - name: Construir y Taggear OrderService
+        run: |
+          docker build -t orderserviceapi:${{ steps.vars.outputs.SHA_TAG }} -f OrderService/OrderService.API/Dockerfile .
+          
+  deploy-staging:
+    name: Despliegue a Staging
+    runs-on: ubuntu-latest
+    needs: build-test # Ejecuta solo si build-test fue exitoso
+    environment: staging # Para protección de entorno y gestión de secretos
+    steps:
+      - uses: actions/checkout@v3
 
-    - name: Restaurar dependencias OrderService
-      run: dotnet restore OrderService/OrderService.API/OrderService.API.csproj
+      - name: Login a GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Compilar OrderService
-      run: dotnet build OrderService/OrderService.API/OrderService.API.csproj --configuration Release
+      - name: Configurar variables de tag
+        id: vars
+        run: echo "SHA_TAG=$(echo $GITHUB_SHA | cut -c1-8)" >> $GITHUB_OUTPUT
 
-    - name: Testear OrderService.API
-      run: dotnet test OrderService/OrderService.API.Test/OrderService.API.Test.csproj
-    
-    - name: Testear OrderService.Application
-      run: dotnet test OrderService/OrderService.Application.Test/OrderService.Application.Test.csproj
-    
-    - name: Testear OrderService.Infrastructure
-      run: dotnet test OrderService/OrderService.Infrastructure.Test/OrderService.Infrastructure.Test.csproj
+      - name: Subir ProductService
+        run: |
+          IMAGE_URL=ghcr.io/${{ github.repository_owner }}/productserviceapi:${{ steps.vars.outputs.SHA_TAG }}
+          docker tag productserviceapi:${{ steps.vars.outputs.SHA_TAG }} $IMAGE_URL
+          docker push $IMAGE_URL
 
-    - name: Construir imagen ProductService
-      run: docker build -t productserviceapi -f ProductService/ProductService.API/Dockerfile .
+      - name: Subir OrderService
+        run: |
+          IMAGE_URL=ghcr.io/${{ github.repository_owner }}/orderserviceapi:${{ steps.vars.outputs.SHA_TAG }}
+          docker tag orderserviceapi:${{ steps.vars.outputs.SHA_TAG }} $IMAGE_URL
+          docker push $IMAGE_URL
 
-    - name: Construir imagen OrderService
-      run: docker build -t orderserviceapi -f OrderService/OrderService.API/Dockerfile .
+      - name: Desplegar en Staging (Ejemplo con SSH)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /ruta/a/tu/despliegue/staging
+            # Asume que los archivos docker-compose.yml y .staging.yml están en el servidor
+            # y que la variable de conexión a DB está definida en el entorno del servidor.
+            docker compose \
+                -f docker-compose.yml \
+                -f docker-compose.staging.yml \
+                -e ASPNETCORE_ENVIRONMENT=Staging \
+                # Usar la variable de entorno real de Staging
+                -e ConnectionStrings__DefaultConnection='${{ secrets.STAGING_DB_CONNECTION }}' \
+                up -d --force-recreate
