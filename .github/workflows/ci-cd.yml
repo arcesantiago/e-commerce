@@ -63,7 +63,9 @@ jobs:
     name: Despliegue a Staging
     runs-on: ubuntu-latest
     needs: build-test # Ejecuta solo si build-test fue exitoso
-    environment: staging # Para protección de entorno y gestión de secretos
+    environment: staging
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v3
 
@@ -71,6 +73,13 @@ jobs:
         id: vars
         run: echo "SHA_TAG=$(echo $GITHUB_SHA | cut -c1-8)" >> $GITHUB_OUTPUT
 
+      - name: Login a GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Subir ProductService
         run: |
           IMAGE_URL=ghcr.io/${{ github.repository_owner }}/productserviceapi:${{ steps.vars.outputs.SHA_TAG }}
