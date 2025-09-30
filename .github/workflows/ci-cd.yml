@@ -21,11 +21,9 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Ejecutar Tests para ProductService
-        # Apunta directamente al archivo .sln del servicio de Productos
         run: dotnet test ProductService/ProductService.sln --configuration Release --verbosity normal
 
       - name: Ejecutar Tests para OrderService
-        # Apunta directamente al archivo .sln del servicio de Pedidos
         run: dotnet test OrderService/OrderService.sln --configuration Release --verbosity normal
 
       - name: Configurar variables de tag
@@ -62,7 +60,7 @@ jobs:
   deploy-staging:
     name: Despliegue a Staging
     runs-on: ubuntu-latest
-    needs: build-test # Ejecuta solo si build-test fue exitoso
+    needs: build-test
     environment: staging
     permissions:
       contents: read
@@ -84,8 +82,6 @@ jobs:
             ORDER_IMAGE=ghcr.io/${{ github.repository_owner }}/orderserviceapi:$SHA_TAG
             
             cd /ruta/a/tu/despliegue/staging
-            
-            git pull origin main 
             
             echo "${{ secrets.GHCR_PULL_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USER }} --password-stdin
             
