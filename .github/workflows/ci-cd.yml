@@ -34,9 +34,21 @@ jobs:
         run: |
           docker build -t productserviceapi:${{ steps.vars.outputs.SHA_TAG }} -f ProductService/ProductService.API/Dockerfile .
 
+          IMAGE_URL=ghcr.io/${{ github.repository_owner }}/productserviceapi:${{ steps.vars.outputs.SHA_TAG }}
+
+          docker tag productserviceapi:${{ steps.vars.outputs.SHA_TAG }} $IMAGE_URL
+
+          docker push $IMAGE_URL
+
       - name: Construir y Taggear OrderService
         run: |
           docker build -t orderserviceapi:${{ steps.vars.outputs.SHA_TAG }} -f OrderService/OrderService.API/Dockerfile .
+
+          IMAGE_URL=ghcr.io/${{ github.repository_owner }}/orderserviceapi:${{ steps.vars.outputs.SHA_TAG }}
+
+          docker tag orderserviceapi:${{ steps.vars.outputs.SHA_TAG }} $IMAGE_URL
+
+          docker push $IMAGE_URL
           
   deploy-staging:
     name: Despliegue a Staging
