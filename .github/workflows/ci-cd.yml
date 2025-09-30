@@ -18,8 +18,13 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Ejecutar Tests para toda la solución (asume que existe un .sln)
-        run: dotnet test --configuration Release --verbosity normal
+      - name: Ejecutar Tests para ProductService
+        # Apunta directamente al archivo .sln del servicio de Productos
+        run: dotnet test ProductService/ProductService.sln --configuration Release --verbosity normal
+
+      - name: Ejecutar Tests para OrderService
+        # Apunta directamente al archivo .sln del servicio de Pedidos
+        run: dotnet test OrderService/OrderService.sln --configuration Release --verbosity normal
 
       - name: Configurar variables de tag
         id: vars
