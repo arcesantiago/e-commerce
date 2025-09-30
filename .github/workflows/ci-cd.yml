@@ -66,31 +66,9 @@ jobs:
     environment: staging
     permissions:
       contents: read
+      id-token: write 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Configurar variables de tag
-        id: vars
-        run: echo "SHA_TAG=$(echo $GITHUB_SHA | cut -c1-8)" >> $GITHUB_OUTPUT
-
-      - name: Login a GHCR
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Subir ProductService
-        run: |
-          IMAGE_URL=ghcr.io/${{ github.repository_owner }}/productserviceapi:${{ steps.vars.outputs.SHA_TAG }}
-          docker tag productserviceapi:${{ steps.vars.outputs.SHA_TAG }} $IMAGE_URL
-          docker push $IMAGE_URL
-
-      - name: Subir OrderService
-        run: |
-          IMAGE_URL=ghcr.io/${{ github.repository_owner }}/orderserviceapi:${{ steps.vars.outputs.SHA_TAG }}
-          docker tag orderserviceapi:${{ steps.vars.outputs.SHA_TAG }} $IMAGE_URL
-          docker push $IMAGE_URL
 
       - name: Desplegar en Staging (Ejemplo con SSH)
         uses: appleboy/ssh-action@v1.0.3
@@ -99,13 +77,23 @@ jobs:
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+
+            SHA_TAG=$(echo ${{ github.sha }} | cut -c1-8)
+            
+            PRODUCT_IMAGE=ghcr.io/${{ github.repository_owner }}/productserviceapi:$SHA_TAG
+            ORDER_IMAGE=ghcr.io/${{ github.repository_owner }}/orderserviceapi:$SHA_TAG
+            
             cd /ruta/a/tu/despliegue/staging
-            # Asume que los archivos docker-compose.yml y .staging.yml están en el servidor
-            # y que la variable de conexión a DB está definida en el entorno del servidor.
+            
+            git pull origin main 
+            
+            echo "${{ secrets.GHCR_PULL_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USER }} --password-stdin
+            
             docker compose \
                 -f docker-compose.yml \
                 -f docker-compose.staging.yml \
                 -e ASPNETCORE_ENVIRONMENT=Staging \
-                # Usar la variable de entorno real de Staging
                 -e ConnectionStrings__DefaultConnection='${{ secrets.STAGING_DB_CONNECTION }}' \
+                -e PRODUCT_IMAGE_TAG=$PRODUCT_IMAGE \
+                -e ORDER_IMAGE_TAG=$ORDER_IMAGE \
                 up -d --force-recreate
