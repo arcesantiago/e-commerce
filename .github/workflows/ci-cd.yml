@@ -10,6 +10,8 @@ jobs:
   build-test:
     name: Build & Test (Microservices)
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - uses: actions/checkout@v3
 
@@ -29,7 +31,14 @@ jobs:
       - name: Configurar variables de tag
         id: vars
         run: echo "SHA_TAG=$(echo $GITHUB_SHA | cut -c1-8)" >> $GITHUB_OUTPUT
-        
+
+      - name: Login a GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Construir y Taggear ProductService
         run: |
           docker build -t productserviceapi:${{ steps.vars.outputs.SHA_TAG }} -f ProductService/ProductService.API/Dockerfile .
@@ -57,13 +66,6 @@ jobs:
     environment: staging # Para protección de entorno y gestión de secretos
     steps:
       - uses: actions/checkout@v3
-
-      - name: Login a GHCR
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configurar variables de tag
         id: vars
