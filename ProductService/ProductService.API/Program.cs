@@ -1,3 +1,4 @@
+using DotNetEnv.Configuration;
 using Microsoft.EntityFrameworkCore;
 using ProductService.API.Middleware;
 using ProductService.Application;
@@ -14,6 +15,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Configuration
+    .AddJsonFile($"appsettings.json", optional: true)
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true);
+
+builder.Configuration.AddEnvironmentVariables();
+
+if (builder.Environment.IsDevelopment() && File.Exists("../.env.development"))
+    builder.Configuration.AddDotNetEnv("../.env.development");
+
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddAplicationServices();
 
@@ -22,11 +32,6 @@ builder.Services.AddHealthChecks()
         connectionString: builder.Configuration.GetConnectionString("DefaultConnection")!,
         name: "sqlserver",
         tags: new[] { "db", "sql" });
-
-builder.Configuration
-    .AddJsonFile($"appsettings.json")
-    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
-    .Build();
 
 var app = builder.Build();
 
@@ -44,12 +49,11 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
 
-    if (!app.Environment.IsDevelopment())
-    await db.Database.MigrateAsync();
+    if(!builder.Environment.IsDevelopment())
+        await db.Database.MigrateAsync();
 
     DbInitializer.Seed(db);
 }
-
 
 app.UseMiddleware<ExceptionMiddleware>();
 
@@ -64,5 +68,3 @@ app.MapControllers();
 app.Run();
 
 public partial class Program { }
-
-//test CI/CD

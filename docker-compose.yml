@@ -1,16 +1,10 @@
-
 services:
   productservice.api:
-    image: productserviceapi
+    image: ${IMAGE_TAG:-base}-productserviceapi:latest
     build:
       context: .
       dockerfile: ProductService/ProductService.API/Dockerfile
     container_name: productservice.api
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Testing
-      - ConnectionStrings__DefaultConnection=Server=db;Database=ProductsDb;User Id=sa;Password=Your_strong!Passw0rd;Encrypt=False
-    ports:
-      - "8082:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -18,16 +12,11 @@ services:
       - appnet
 
   orderservice.api:
-    image: orderserviceapi
+    image: ${IMAGE_TAG:-base}-orderserviceapi:latest
     build:
       context: .
       dockerfile: OrderService/OrderService.API/Dockerfile
     container_name: orderservice.api
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Testing
-      - ConnectionStrings__DefaultConnection=Server=db;Database=OrdersDb;User Id=sa;Password=Your_strong!Passw0rd;Encrypt=False
-    ports:
-      - "8081:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -40,8 +29,6 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=Your_strong!Passw0rd
-    ports:
-      - "1433:1433"
     healthcheck:
       test: ["CMD-SHELL", "pgrep sqlservr"]
       interval: 10s
@@ -59,4 +46,3 @@ networks:
 
 volumes:
   mssql_data:
-

@@ -1,3 +1,4 @@
+using DotNetEnv.Configuration;
 using Microsoft.EntityFrameworkCore;
 using OrderService.API.Middleware;
 using OrderService.Application;
@@ -15,9 +16,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Configuration
-    .AddJsonFile($"appsettings.json")
-    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
-    .Build();
+    .AddJsonFile($"appsettings.json", optional: true)
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true);
+
+builder.Configuration.AddEnvironmentVariables();
+
+if (builder.Environment.IsDevelopment() && File.Exists("../.env.development"))
+    builder.Configuration.AddDotNetEnv("../.env.development");
 
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddAplicationServices();
@@ -44,7 +49,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
 
-    if (!app.Environment.IsDevelopment())
+    if (!builder.Environment.IsDevelopment())
         await db.Database.MigrateAsync();
 
     DbInitializer.Seed(db);
@@ -63,5 +68,3 @@ app.MapControllers();
 app.Run();
 
 public partial class Program { }
-
-//test CI/CD

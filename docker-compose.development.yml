@@ -1,0 +1,22 @@
+services:
+  productservice.api:
+    image: dev-productserviceapi:latest 
+    env_file:
+      - ProductService/.env 
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./ProductService/ProductService.API:/src/ProductService.API 
+
+  orderservice.api:
+    image: dev-orderservice:latest 
+    env_file:
+      - OrderService/.env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./OrderService/OrderService.API:/src/OrderService.API

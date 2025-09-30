@@ -33,7 +33,7 @@ namespace OrderService.Infrastructure.Services
         public async Task<ProductSnapshot> GetByIdAsync(int id)
         {
             var response = await _retryPolicy.ExecuteAsync(() =>
-                _httpClient.GetAsync($"/api/Products/{id}"));
+                _httpClient.GetAsync($"api/Products/{id}"));
 
             if (response.StatusCode == HttpStatusCode.NotFound)
                 throw new NotFoundException(nameof(ProductSnapshot), id);
