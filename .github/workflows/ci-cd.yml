@@ -81,7 +81,7 @@ jobs:
             PRODUCT_IMAGE=ghcr.io/${{ github.repository_owner }}/productserviceapi:$SHA_TAG
             ORDER_IMAGE=ghcr.io/${{ github.repository_owner }}/orderserviceapi:$SHA_TAG
             
-            cd /ruta/a/tu/despliegue/staging
+            cd /home/ec2-user/e-commerce/
             
             echo "${{ secrets.GHCR_PULL_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USER }} --password-stdin
             
