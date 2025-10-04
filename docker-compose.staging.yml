@@ -2,7 +2,7 @@ services:
   productservice.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Staging 
-    
+      - ConnectionStrings__DefaultConnection=Server=db;Database=ProductDb;User Id=sa;Password=Your_strong!Passw0rd;Encrypt=False
     volumes: []
     
     deploy:
@@ -15,7 +15,7 @@ services:
   orderservice.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Staging
-
+      - ConnectionStrings__DefaultConnection=Server=db;Database=OrderDb;User Id=sa;Password=Your_strong!Passw0rd;Encrypt=False
     volumes: []
     
     deploy:
