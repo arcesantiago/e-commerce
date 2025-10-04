@@ -29,8 +29,5 @@ services:
     ports: []
 
     deploy:
-      resources:
-        limits:
-          memory: 1024M
       restart_policy:
         condition: always
