@@ -1,6 +1,6 @@
 services:
   productservice.api:
-    image: ${PRODUCT_IMAGE_TAG:-base}-productserviceapi:latest
+    image: ${PRODUCT_IMAGE_TAG}
     container_name: productservice.api
     depends_on:
       db:
@@ -9,7 +9,7 @@ services:
       - appnet
 
   orderservice.api:
-    image: ${ORDER_IMAGE_TAG:-base}-orderserviceapi:latest
+    image: ${ORDER_IMAGE_TAG}
     container_name: orderservice.api
     depends_on:
       db:
