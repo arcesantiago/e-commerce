@@ -85,8 +85,8 @@ jobs:
             
             echo "${{ secrets.GHCR_PULL_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USER }} --password-stdin
             
-            docker compose \
-                -f docker-compose.yml \
-                -f docker-compose.staging.yml \
-                -e ASPNETCORE_ENVIRONMENT=Staging \
-                up -d --force-recreate
+            export ASPNETCORE_ENVIRONMENT=Staging
+            export PRODUCT_IMAGE_TAG=$PRODUCT_IMAGE_URL
+            export ORDER_IMAGE_TAG=$ORDER_IMAGE_URL
+
+            docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d --force-recreate
