@@ -89,7 +89,4 @@ jobs:
                 -f docker-compose.yml \
                 -f docker-compose.staging.yml \
                 -e ASPNETCORE_ENVIRONMENT=Staging \
-                -e ConnectionStrings__DefaultConnection='${{ secrets.STAGING_DB_CONNECTION }}' \
-                -e PRODUCT_IMAGE_TAG=$PRODUCT_IMAGE \
-                -e ORDER_IMAGE_TAG=$ORDER_IMAGE \
                 up -d --force-recreate
