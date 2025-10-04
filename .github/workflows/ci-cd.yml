@@ -82,6 +82,8 @@ jobs:
             ORDER_IMAGE_URL=ghcr.io/${{ github.repository_owner }}/orderserviceapi:$SHA_TAG
             
             cd /home/ec2-user/e-commerce/
+
+            git pull origin main
             
             echo "${{ secrets.GHCR_PULL_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USER }} --password-stdin
             
