@@ -1,9 +1,6 @@
 services:
   productservice.api:
-    image: ${IMAGE_TAG:-base}-productserviceapi:latest
-    build:
-      context: .
-      dockerfile: ProductService/ProductService.API/Dockerfile
+    image: ${PRODUCT_IMAGE_TAG:-base}-productserviceapi:latest
     container_name: productservice.api
     depends_on:
       db:
@@ -12,10 +9,7 @@ services:
       - appnet
 
   orderservice.api:
-    image: ${IMAGE_TAG:-base}-orderserviceapi:latest
-    build:
-      context: .
-      dockerfile: OrderService/OrderService.API/Dockerfile
+    image: ${ORDER_IMAGE_TAG:-base}-orderserviceapi:latest
     container_name: orderservice.api
     depends_on:
       db:
