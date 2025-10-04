@@ -22,7 +22,7 @@ services:
     container_name: sqlserver
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=Your_strong!Passw0rd
+      - MSSQL_SA_PASSWORD=Your_strong!Passw0rd123A
     healthcheck:
       test: ["CMD-SHELL", "pgrep sqlservr"]
       interval: 10s
