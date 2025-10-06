@@ -9,7 +9,7 @@ namespace OrderService.Application.Features.Orders.Queries.GetOrder
         public string CustomerId { get; set; } = string.Empty;
         public OrderStatus Status { get; set; }
         public decimal TotalAmount { get; set; }
-        public DateTime OrderDate { get; set; }
+        public DateTimeOffset OrderDate { get; set; }
         public List<OrderItemVm> Items { get; set; } = new();
     }
 
