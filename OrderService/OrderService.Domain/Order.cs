@@ -8,7 +8,7 @@ namespace OrderService.Domain
         public string CustomerId { get; set; } = string.Empty;
         public OrderStatus Status { get; set; }
         public decimal TotalAmount { get; set; }
-        public DateTime OrderDate { get; set; }
+        public DateTimeOffset OrderDate { get; set; }
         public List<OrderItem> Items { get; set; } = new();
     }
 }

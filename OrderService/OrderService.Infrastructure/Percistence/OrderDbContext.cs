@@ -29,11 +29,11 @@ namespace OrderService.Infrastructure.Percistence
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.CreatedAt = DateTime.Now;
+                        entry.Entity.CreatedAt = DateTimeOffset.UtcNow;
                         break;
 
                     case EntityState.Modified:
-                        entry.Entity.UpdatedAt = DateTime.Now;
+                        entry.Entity.UpdatedAt = DateTimeOffset.UtcNow;
                         break;
                 }
             }

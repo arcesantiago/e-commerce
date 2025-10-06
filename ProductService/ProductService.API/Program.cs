@@ -1,5 +1,6 @@
 using DotNetEnv.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using ProductService.API.Middleware;
 using ProductService.Application;
 using ProductService.Infrastructure;
@@ -28,10 +29,10 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddAplicationServices();
 
 builder.Services.AddHealthChecks()
-    .AddSqlServer(
-        connectionString: builder.Configuration.GetConnectionString("DefaultConnection")!,
-        name: "sqlserver",
-        tags: new[] { "db", "sql" });
+    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection")!,
+        name: "product",
+        failureStatus: HealthStatus.Degraded,
+        tags: new[] { "ready", "database" });
 
 var app = builder.Build();
 

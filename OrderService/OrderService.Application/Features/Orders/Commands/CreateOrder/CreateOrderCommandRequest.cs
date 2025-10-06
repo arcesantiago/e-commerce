@@ -3,7 +3,7 @@
     public class CreateOrderCommandRequest
     {
         public string CustomerId { get; set; } = string.Empty;
-        public DateTime OrderDate { get; set; }
+        public DateTimeOffset OrderDate { get; set; }
         public List<CreateOrderCommandItemRequest> Items { get; set; } = new();
     }
 

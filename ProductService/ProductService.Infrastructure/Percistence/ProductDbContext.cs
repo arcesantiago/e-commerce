@@ -19,11 +19,11 @@ namespace ProductService.Infrastructure.Percistence
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.CreatedAt = DateTime.Now;
+                        entry.Entity.CreatedAt = DateTime.UtcNow;
                         break;
 
                     case EntityState.Modified:
-                        entry.Entity.UpdatedAt = DateTime.Now;
+                        entry.Entity.UpdatedAt = DateTime.UtcNow;
                         break;
                 }
             }

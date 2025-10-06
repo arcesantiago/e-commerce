@@ -1,6 +1,6 @@
 services:
   productservice.api:
-    image: ${PRODUCT_IMAGE_TAG}
+    image: ${PRODUCT_IMAGE_TAG-}
     container_name: productservice.api
     depends_on:
       db:
@@ -9,7 +9,7 @@ services:
       - appnet
 
   orderservice.api:
-    image: ${ORDER_IMAGE_TAG}
+    image: ${ORDER_IMAGE_TAG-}
     container_name: orderservice.api
     depends_on:
       db:
@@ -18,26 +18,26 @@ services:
       - appnet
 
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
+    image: postgres:16-alpine 
+    container_name: postgresdb
+    restart: always
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=Your_strong!Passw0rd123A
-      - MSSQL_LCFLATFILE_ROOT=/var/opt/mssql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pgrep sqlservr"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
-      start_period: 30s
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Romari0!
     volumes:
-      - mssql_data:/var/opt/mssql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - appnet
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 networks:
   appnet:
     driver: bridge
 
 volumes:
-  mssql_data:
+  postgres_data:
