@@ -40,19 +40,21 @@ jobs:
                 retries: 5
           EOF
           
-          echo "Intentando levantar el contenedor de PostgreSQL..."
-
-          docker compose -f docker-compose.test.yml up -d --force-recreate
+          echo "Intentando levantar el contenedor de PostgreSQL en segundo plano para diagnóstico..."
           
-          echo "Esperando 30 segundos para el inicio completo de la DB..."
-          sleep 30 
+          docker compose -f docker-compose.test.yml up --force-recreate &
+          
+          sleep 10 
 
-          if ! docker ps --filter name=postgres-test | grep -q postgres-test; then
-             echo "‼️ ERROR: El contenedor 'postgres-test' NO se pudo iniciar."
-             echo "Imprimiendo logs de Docker para diagnóstico:"
-             # Imprime los logs del servicio (clave para ver errores de inicialización)
+          CONTAINER_STATUS=$(docker inspect -f '{{.State.Status}}' postgres-test 2>/dev/null || echo "not_found")
+          
+          if [ "$CONTAINER_STATUS" != "running" ]; then
+             echo "‼️ ERROR FATAL: El contenedor 'postgres-test' falló al iniciar o salió inmediatamente. ‼️"
+             echo "Imprimiendo logs de Docker para ver la causa (problemas de inicialización de la DB):"
              docker compose -f docker-compose.test.yml logs postgres-test
-             exit 1 # Detiene el workflow
+             
+             docker compose -f docker-compose.test.yml down -v
+             exit 1 
           fi
 
           echo "Contenedor verificado y en ejecución. Esperando la inicialización del servicio..."
@@ -62,13 +64,13 @@ jobs:
             echo "PostgreSQL no está listo (intentando $COUNT)..."
             sleep 5
             COUNT=$((COUNT + 1))
-            if [ $COUNT -gt 12 ]; then # Fallar después de 60 segundos más
-              echo "FALLO: Timeout al esperar la base de datos."
+            if [ $COUNT -gt 12 ]; then
+              echo "FALLO: Timeout al esperar la base de datos. Imprimiendo logs finales."
+              docker compose -f docker-compose.test.yml logs postgres-test
               exit 1
             fi
           done
           echo "PostgreSQL está listo."
-
       - name: Crear Base de Datos 'product' (Si no se creó automáticamente)
         run: |
           docker exec -it postgres-test psql -U postgres -d order -c "CREATE DATABASE product;" 
