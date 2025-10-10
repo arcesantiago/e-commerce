@@ -20,38 +20,50 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Configurar Entorno de Pruebas (Solución Definitiva)
+      - name: Configurar Entorno de Pruebas (Solución Final con Sleep y Exec)
         run: |
-          # 1. Crear el docker-compose.test.yml (Ajustando el healthcheck)
+          # 1. Crear el docker-compose.test.yml (Eliminamos el healthcheck)
           cat <<EOF > docker-compose.test.yml
           version: '3.8'
           services:
             postgres-test:
               image: postgres:15-alpine
+              container_name: postgres-test-ci # 🔑 Nombre simple para la CLI
               environment:
                 POSTGRES_USER: postgres
                 POSTGRES_PASSWORD: Romari0!
                 POSTGRES_DB: order
               ports:
                 - "5432:5432"
-              healthcheck: 
-                # 🔑 CAMBIO CLAVE: Especificar la base de datos (-d order) y más retries.
-                test: ["CMD", "pg_isready", "-U", "postgres", "-d", "order"]
-                interval: 5s
-                timeout: 5s
-                retries: 12 # Aumentamos a 12 retries (60 segundos)
           EOF
           
           echo "Levantando contenedor de PostgreSQL..."
           docker compose -f docker-compose.test.yml up -d --force-recreate postgres-test 
           
-          # 3. Esperar al Healthcheck de Docker (Ahora espera 60 segundos)
-          echo "Esperando que el servicio 'postgres-test' esté saludable (máx. 60s)..."
-          docker compose -f docker-compose.test.yml wait postgres-test
-          
-          # 4. Crear Base de Datos 'product'
-          echo "Creando base de datos 'product'..."
-          docker compose exec postgres-test psql -U postgres -d order -c "CREATE DATABASE product;" 
+          # 2. Sleep agresivo
+          echo "Esperando 45 segundos para el inicio completo de la DB..."
+          sleep 45
+
+          # 3. Esperar a que la base de datos esté lista usando docker exec
+          #    La espera es ahora sobre el localhost (el puerto mapeado 5432)
+          COUNT=0
+          until docker exec postgres-test-ci pg_isready -h localhost -U postgres -d order; do
+            echo "PostgreSQL no está listo (intentando $COUNT)..."
+            sleep 5
+            COUNT=$((COUNT + 1))
+            if [ $COUNT -gt 6 ]; then # Fallar después de 30 segundos más
+              echo "FALLO: Timeout al esperar la base de datos."
+              # Muestra logs si falla
+              docker compose -f docker-compose.test.yml logs postgres-test
+              exit 1
+            fi
+          done
+          echo "PostgreSQL está listo."
+
+      - name: Crear Base de Datos 'product'
+        # Usamos el nombre explícito del contenedor que definimos en el compose file
+        run: |
+          docker exec postgres-test-ci psql -U postgres -d order -c "CREATE DATABASE product;" 
         env:
           PGPASSWORD: Romari0!
 
