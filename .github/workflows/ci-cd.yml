@@ -22,6 +22,7 @@ jobs:
 
       - name: Configurar Entorno de Pruebas (Docker Compose Multi-DB)
         run: |
+          # 1. Crear el docker-compose.test.yml
           cat <<EOF > docker-compose.test.yml
           version: '3.8'
           services:
@@ -30,52 +31,51 @@ jobs:
               environment:
                 POSTGRES_USER: postgres
                 POSTGRES_PASSWORD: Romari0!
-                POSTGRES_DB: order 
+                POSTGRES_DB: order
               ports:
                 - "5432:5432"
-              healthcheck:
-                test: ["CMD-SHELL", "pg_isready -U postgres -d order"]
+              healthcheck: # 🔑 Docker Compose usará esto para el comando 'wait'
+                test: ["CMD", "pg_isready", "-U", "postgres"]
                 interval: 5s
                 timeout: 5s
-                retries: 5
+                retries: 10 # 50 segundos de espera total
           EOF
           
-          echo "Levantando contenedor..."
-          # Usamos 'postgres-test-project' como nombre del proyecto para que el prefijo sea simple.
-          docker compose -f docker-compose.test.yml -p postgres-test-project up -d --force-recreate
+          echo "Levantando contenedor de PostgreSQL..."
+          # 2. Levantar el servicio SOLO 'postgres-test'
+          # Esto evita que Docker Compose intente levantar servicios de producción.
+          docker compose -f docker-compose.test.yml up -d --force-recreate postgres-test 
           
-          # 3. Esperar 20 segundos de forma simple para que el servicio inicie.
-          echo "Esperando 20 segundos para la inicialización de la DB..."
-          sleep 20 
-
-          # 4. Esperar a que la base de datos esté lista usando docker compose exec
-          #    Usamos el nombre del servicio 'postgres-test'
-          COUNT=0
-          until docker compose exec postgres-test pg_isready -U postgres -d order; do
-            echo "PostgreSQL no está listo (intentando $COUNT)..."
-            sleep 5
-            COUNT=$((COUNT + 1))
-            if [ $COUNT -gt 12 ]; then 
-              echo "FALLO: Timeout al esperar la base de datos."
-              docker compose -f docker-compose.test.yml -p postgres-test-project logs postgres-test
-              exit 1
-            fi
-          done
-          echo "PostgreSQL está listo."
+          # 3. Esperar al Healthcheck de Docker
+          echo "Esperando que el servicio 'postgres-test' esté saludable (máx. 50s)..."
+          # 'wait' se detiene hasta que el healthcheck pasa
+          docker compose -f docker-compose.test.yml wait postgres-test --timeout 60 
 
       - name: Crear Base de Datos 'product'
-        # Usamos docker compose exec para la creación de la segunda DB
+        # Ahora que el contenedor está saludable, creamos la segunda DB.
         run: |
+          # Usamos la DB inicial 'order' para ejecutar el comando de creación
           docker compose exec postgres-test psql -U postgres -d order -c "CREATE DATABASE product;" 
         env:
-          PGPASSWORD: Romari0!
+          PGPASSWORD: Romari0! # Se usa para la autenticación Psql
 
-      # ... (El resto de los pasos de test y cleanup) ...
-      
+      - name: Ejecutar Tests para ProductService (Integración)
+        run: |
+          # 🔑 Inyectamos la variable de entorno 'Testing'
+          ASPNETCORE_ENVIRONMENT=Testing \
+          dotnet test ProductService/ProductService.sln --configuration Release --verbosity normal
+
+      - name: Ejecutar Tests para OrderService (Integración)
+        run: |
+          # 🔑 Inyectamos la variable de entorno 'Testing'
+          ASPNETCORE_ENVIRONMENT=Testing \
+          dotnet test OrderService/OrderService.sln --configuration Release --verbosity normal
+          
       - name: Limpiar Contenedor de Pruebas
-        if: always() 
-        # Usamos -p para especificar el proyecto a eliminar
-        run: docker compose -f docker-compose.test.yml -p postgres-test-project down -v
+        if: always() # Garantiza la limpieza incluso si los tests fallan
+        run: docker compose -f docker-compose.test.yml down -v
+
+      # --- El resto del flujo de Build/Deploy permanece igual ---
 
       - name: Configurar variables de tag
         id: vars
@@ -91,21 +91,15 @@ jobs:
       - name: Construir y Taggear ProductService
         run: |
           docker build -t productserviceapi:${{ steps.vars.outputs.SHA_TAG }} -f ProductService/ProductService.API/Dockerfile .
-
           IMAGE_URL=ghcr.io/${{ github.repository_owner }}/productserviceapi:${{ steps.vars.outputs.SHA_TAG }}
-
           docker tag productserviceapi:${{ steps.vars.outputs.SHA_TAG }} $IMAGE_URL
-
           docker push $IMAGE_URL
 
       - name: Construir y Taggear OrderService
         run: |
           docker build -t orderserviceapi:${{ steps.vars.outputs.SHA_TAG }} -f OrderService/OrderService.API/Dockerfile .
-
           IMAGE_URL=ghcr.io/${{ github.repository_owner }}/orderserviceapi:${{ steps.vars.outputs.SHA_TAG }}
-
           docker tag orderserviceapi:${{ steps.vars.outputs.SHA_TAG }} $IMAGE_URL
-
           docker push $IMAGE_URL
           
   deploy-staging:
