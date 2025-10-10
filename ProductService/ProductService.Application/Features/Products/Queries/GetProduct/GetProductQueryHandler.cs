@@ -20,7 +20,7 @@ namespace ProductService.Application.Features.Products.Queries.GetProduct
 
         public async Task<ProductVm> Handle(GetProductQuery request, CancellationToken cancellationToken)
         {
-            var product = await _productRepository.GetByIdAsync(request.Id);
+            var product = await _productRepository.FindAsync(request.Id);
 
             if (product is null)
                 throw new NotFoundException(nameof(Product), request.Id);

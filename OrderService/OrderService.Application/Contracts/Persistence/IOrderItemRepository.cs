@@ -1,8 +1,10 @@
-﻿using OrderService.Domain;
+﻿using OrderService.Application.Contracts.Persistence.Read;
+using OrderService.Application.Contracts.Persistence.Write;
+using OrderService.Domain;
 
 namespace OrderService.Application.Contracts.Persistence
 {
-    public interface IOrderItemRepository : IAsyncRepository<OrderItem>
+    public interface IOrderItemRepository : IReadRepository<OrderItem>, IWriteRepository<OrderItem>
     {
     }
 }

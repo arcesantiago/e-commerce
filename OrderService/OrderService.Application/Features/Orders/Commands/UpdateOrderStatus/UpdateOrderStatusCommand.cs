@@ -21,7 +21,7 @@ namespace OrderService.Application.Features.Orders.Commands.UpdateOrderStatus
 
         public async Task<bool> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
         {
-            var order = await _repository.GetByIdAsync(request.Id);
+            var order = await _repository.FindAsync(request.Id);
             if (order is null)
             {
                 _logger.LogWarning($"Order {request.Id} not found");

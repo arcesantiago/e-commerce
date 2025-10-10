@@ -1,31 +1,27 @@
-﻿using Castle.Core.Resource;
-using Microsoft.EntityFrameworkCore;
-using OrderService.Domain;
+﻿using OrderService.Domain;
 using OrderService.Domain.Enums;
-using OrderService.Infrastructure.Percistence;
 using OrderService.Infrastructure.Repositories;
+using OrderService.Infrastructure.Test.IntegrationTests.Fixtures;
 using System.Linq.Expressions;
 
 namespace OrderService.Infrastructure.Test.IntegrationTests
 {
-    public class RepositoryBaseOrderTests
+    public class OrderRepositoryTest : IClassFixture<OrderDbFixture>
     {
-        private readonly OrderDbContext _context;
-        private readonly RepositoryBase<Order> _repository;
+        private readonly OrderDbFixture _orderDbFixture;
+        private readonly RepositoryBase<Order> _orderRepository;
 
-        public RepositoryBaseOrderTests()
+        public OrderRepositoryTest(OrderDbFixture fixture)
         {
-            var options = new DbContextOptionsBuilder<OrderDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-
-            _context = new OrderDbContext(options);
-            _repository = new RepositoryBase<Order>(_context);
+            _orderDbFixture = fixture;
+            _orderRepository = fixture.OrderRepository;
         }
 
         [Fact]
         public async Task AddAsync_ShouldAddOrderWithItems()
         {
+            await _orderDbFixture.ResetDatabaseAsync();
+
             var order = new Order
             {
                 CustomerId = "CUST-1",
@@ -38,20 +34,22 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
                 }
             };
 
-            var result = await _repository.AddAsync(order);
+            var result = await _orderRepository.AddAsync(order);
 
             Assert.NotNull(result);
             Assert.Single(result.Items);
-            Assert.Equal(1, _context.Orders!.Count());
-            Assert.Equal(1, _context.Set<OrderItem>().Count());
+            Assert.Equal(1, await _orderRepository.CountAsync());
+            Assert.Equal(1, _orderDbFixture.Context.Set<OrderItem>().Count());
         }
 
         [Fact]
         public async Task GetByIdAsync_ShouldReturnOrder()
         {
+            await _orderDbFixture.ResetDatabaseAsync();
+
             var order = await SeedOrderAsync();
 
-            var result = await _repository.GetByIdAsync(order.Id);
+            var result = await _orderRepository.FindAsync(order.Id);
 
             Assert.NotNull(result);
             Assert.Equal(order.CustomerId, result!.CustomerId);
@@ -60,10 +58,12 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
         [Fact]
         public async Task GetAllAsync_ShouldReturnAllOrders()
         {
+            await _orderDbFixture.ResetDatabaseAsync();
+
             await SeedOrderAsync();
             await SeedOrderAsync();
 
-            var result = await _repository.GetAllAsync();
+            var result = await _orderRepository.GetListAsync();
 
             Assert.Equal(2, result.Count);
         }
@@ -71,10 +71,12 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
         [Fact]
         public async Task GetAsync_WithPredicate_ShouldReturnFilteredOrders()
         {
+            await _orderDbFixture.ResetDatabaseAsync();
+
             await SeedOrderAsync("CUST-1");
             await SeedOrderAsync("CUST-2");
 
-            var result = await _repository.GetAsync(o => o.CustomerId == "CUST-1");
+            var result = await _orderRepository.GetListAsync(o => o.CustomerId == "CUST-1");
 
             Assert.Single(result);
             Assert.Equal("CUST-1", result.First().CustomerId);
@@ -83,11 +85,13 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
         [Fact]
         public async Task GetAsync_WithIncludeString_ShouldLoadItems()
         {
+            await _orderDbFixture.ResetDatabaseAsync();
+
             var order = await SeedOrderAsync();
 
-            var result = await _repository.GetAsync(
+            var result = await _orderRepository.GetListAsync(
                 predicate: o => o.Id == order.Id,
-                includeString: "Items"
+                includes: new() { x => x.Items }
             );
 
             var loadedOrder = result.First();
@@ -98,9 +102,11 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
         [Fact]
         public async Task GetAsync_WithIncludesExpression_ShouldLoadItems()
         {
+            await _orderDbFixture.ResetDatabaseAsync();
+
             var order = await SeedOrderAsync();
 
-            var result = await _repository.GetAsync(
+            var result = await _orderRepository.GetListAsync(
                 predicate: o => o.Id == order.Id,
                 includes: new List<Expression<Func<Order, object>>>
                 {
@@ -116,32 +122,38 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
         [Fact]
         public async Task UpdateAsync_ShouldModifyOrder()
         {
+            await _orderDbFixture.ResetDatabaseAsync();
+
             var order = await SeedOrderAsync();
             order.Status = OrderStatus.Confirmed;
 
-            var updated = await _repository.UpdateAsync(order);
+            var updated = await _orderRepository.UpdateAsync(order);
 
             Assert.Equal(OrderStatus.Confirmed, updated.Status);
-            Assert.Equal(OrderStatus.Confirmed, _context.Orders!.First().Status);
+            Assert.Equal(OrderStatus.Confirmed, _orderDbFixture.Context.Orders!.First().Status);
         }
 
         [Fact]
         public async Task DeleteAsync_ShouldRemoveOrderAndItems()
         {
+            await _orderDbFixture.ResetDatabaseAsync();
+
             var order = await SeedOrderAsync();
 
-            await _repository.DeleteAsync(order);
+            await _orderRepository.DeleteAsync(order);
 
-            Assert.Empty(_context.Orders!);
-            Assert.Empty(_context!.Set<OrderItem>());
+            Assert.Empty(await _orderRepository.GetListAsync());
+            Assert.Empty(_orderDbFixture.Context.Set<OrderItem>());
         }
 
         [Fact]
         public async Task GetByAsync_WithPredicateAndIncludes_ReturnsEntityWithNavigation()
         {
+            await _orderDbFixture.ResetDatabaseAsync();
+
             var order = await SeedOrderAsync();
 
-            var result = await _repository.GetByAsync(o => o.Id == 1, new() { x => x.Items });
+            var result = await _orderRepository.GetEntityAsync(o => o.Id == 1, includes: new() { x => x.Items });
 
             Assert.NotNull(result);
             Assert.Equal(order.CustomerId, result!.CustomerId);
@@ -161,8 +173,8 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
                 }
             };
 
-            _context.Orders!.Add(order);
-            await _context.SaveChangesAsync();
+            _orderDbFixture.Context.Add(order);
+            await _orderDbFixture.Context.SaveChangesAsync();
             return order;
         }
     }

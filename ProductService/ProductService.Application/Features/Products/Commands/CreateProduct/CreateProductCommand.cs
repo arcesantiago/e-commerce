@@ -24,7 +24,7 @@ namespace ProductService.Application.Features.Products.Commands.CreateProduct
         {
             var productToAdd = _mapper.Map<Product>(request.CreateProductCommandRequest);
 
-            await _productRepository.AddAsync(productToAdd);
+            await _productRepository.AddAsync(productToAdd, cancellationToken);
 
             _logger.LogInformation($"The product {productToAdd.Id} was created successfully");
 

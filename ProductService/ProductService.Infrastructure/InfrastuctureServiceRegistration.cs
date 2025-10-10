@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProductService.Application.Behaviours;
 using ProductService.Application.Contracts.Persistence;
+using ProductService.Application.Contracts.Persistence.Read;
+using ProductService.Application.Contracts.Persistence.Write;
 using ProductService.Infrastructure.Percistence;
 using ProductService.Infrastructure.Repositories;
 
@@ -17,7 +19,8 @@ namespace ProductService.Infrastructure
                 .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, Microsoft.Extensions.Logging.LogLevel.Information)
                 .EnableSensitiveDataLogging());
 
-            services.AddScoped(typeof(IAsyncRepository<>), typeof(RepositoryBase<>));
+            services.AddScoped(typeof(IReadRepository<>), typeof(RepositoryBase<>));
+            services.AddScoped(typeof(IWriteRepository<>), typeof(RepositoryBase<>));
             services.AddScoped<IProductRepository, ProductRepository>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OrderService.Application.Behaviours;
 using OrderService.Application.Contracts.Persistence;
+using OrderService.Application.Contracts.Persistence.Read;
+using OrderService.Application.Contracts.Persistence.Write;
 using OrderService.Infrastructure.Percistence;
 using OrderService.Infrastructure.Repositories;
 using OrderService.Infrastructure.Services;
@@ -18,7 +20,8 @@ namespace OrderService.Infrastructure
                 .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, Microsoft.Extensions.Logging.LogLevel.Information)
                 .EnableSensitiveDataLogging());
 
-            services.AddScoped(typeof(IAsyncRepository<>), typeof(RepositoryBase<>));
+            services.AddScoped(typeof(IReadRepository<>), typeof(RepositoryBase<>));
+            services.AddScoped(typeof(IWriteRepository<>), typeof(RepositoryBase<>));
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 

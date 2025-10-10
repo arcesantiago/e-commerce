@@ -52,7 +52,13 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             };
 
             _repositoryMock
-                .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Order, bool>>>(), It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), It.IsAny<List<Expression<Func<Order, object>>>>(), It.IsAny<bool>()))
+                .Setup(r => r.GetListAsync(
+                    It.IsAny<Expression<Func<Order, bool>>>(), 
+                    It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), 
+                    It.IsAny<List<Expression<Func<Order, object>>>>(), 
+                    It.IsAny<bool>(), 
+                    It.IsAny<CancellationToken>()
+                    ))
                 .ReturnsAsync(orders);
 
             _mapperMock
@@ -68,7 +74,14 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal("CUST-1", result[0].CustomerId);
-            _repositoryMock.Verify(r => r.GetAsync(It.IsAny<Expression<Func<Order, bool>>>(), It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), It.IsAny<List<Expression<Func<Order, object>>>>(), It.IsAny<bool>()), Times.Once);
+            _repositoryMock.Verify(r => r.GetListAsync(
+                It.IsAny<Expression<Func<Order, bool>>>(), 
+                It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), 
+                It.IsAny<List<Expression<Func<Order, object>>>>(), 
+                It.IsAny<bool>(), 
+                It.IsAny<CancellationToken>()
+                ), Times.Once);
+
             _mapperMock.Verify(m => m.Map<List<OrdersVm>>(orders), Times.Once);
         }
 
@@ -80,7 +93,13 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             var ordersVm = new List<OrdersVm>();
 
             _repositoryMock
-                .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Order, bool>>>(), It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), It.IsAny<List<Expression<Func<Order, object>>>>(), It.IsAny<bool>()))
+                .Setup(r => r.GetListAsync(
+                    It.IsAny<Expression<Func<Order, bool>>>(), 
+                    It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), 
+                    It.IsAny<List<Expression<Func<Order, object>>>>(), 
+                    It.IsAny<bool>(), 
+                    It.IsAny<CancellationToken>()
+                    ))
                 .ReturnsAsync(orders);
 
             _mapperMock
@@ -95,7 +114,13 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             // Assert
             Assert.NotNull(result);
             Assert.Empty(result);
-            _repositoryMock.Verify(r => r.GetAsync(It.IsAny<Expression<Func<Order, bool>>>(), It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), It.IsAny<List<Expression<Func<Order, object>>>>(), It.IsAny<bool>()), Times.Once);
+            _repositoryMock.Verify(r => r.GetListAsync(
+                It.IsAny<Expression<Func<Order, bool>>>(), 
+                It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), 
+                It.IsAny<List<Expression<Func<Order, object>>>>(), 
+                It.IsAny<bool>(), 
+                It.IsAny<CancellationToken>()
+                ), Times.Once);
             _mapperMock.Verify(m => m.Map<List<OrdersVm>>(orders), Times.Once);
         }
     }

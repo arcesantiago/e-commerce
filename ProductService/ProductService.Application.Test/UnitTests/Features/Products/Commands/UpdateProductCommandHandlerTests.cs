@@ -8,6 +8,7 @@ using ProductService.Application.Exceptions;
 using ProductService.Application.Features.Products.Commands.UpdateProduct;
 using ProductService.Application.Mapping;
 using ProductService.Domain;
+using System.Linq.Expressions;
 
 namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
 {
@@ -36,11 +37,11 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
             // Arrange
             var existingProduct = new Product { Id = 1, Description = "Old Name", Price = 10, Stock = 2 };
             _productRepositoryMock
-                .Setup(r => r.GetByIdAsync(1))
+                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(existingProduct);
 
             _productRepositoryMock
-                .Setup(r => r.UpdateAsync(It.IsAny<Product>()))
+                .Setup(r => r.UpdateAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(existingProduct);
 
             var handler = new UpdateProductCommandHandler(
@@ -65,7 +66,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
             Assert.Equal("Updated Name", existingProduct.Description);
             Assert.Equal(15m, existingProduct.Price);
             Assert.Equal(5, existingProduct.Stock);
-            _productRepositoryMock.Verify(r => r.UpdateAsync(existingProduct), Times.Once);
+            _productRepositoryMock.Verify(r => r.UpdateAsync(existingProduct, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact(DisplayName = "Handle should throw NotFoundException when product does not exist")]
@@ -73,7 +74,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
         {
             // Arrange
             _productRepositoryMock
-                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product)null!);
 
             var handler = new UpdateProductCommandHandler(

@@ -40,8 +40,8 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
             });
 
             _productRepositoryMock
-                .Setup(r => r.AddAsync(It.IsAny<Product>()))
-                .ReturnsAsync((Product p) => { p.Id = 1; return p; });
+                .Setup(r => r.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Product p, CancellationToken _) => { p.Id = 1; return p; });
 
             var handler = new CreateProductCommandHandler(
                 _loggerMock.Object,
@@ -54,7 +54,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
 
             // Assert
             Assert.Equal(1, result);
-            _productRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Product>()), Times.Once);
+            _productRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact(DisplayName = "Handle should throw when price is invalid")]

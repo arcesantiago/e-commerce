@@ -6,7 +6,7 @@ namespace OrderService.Infrastructure.Repositories
 {
     public class OrderRepository : RepositoryBase<Order>, IOrderRepository
     {
-        public OrderRepository(OrderDbContext context) : base(context)
+        public OrderRepository(OrderDbContext context) : base(context, context.Set<Order>())
         {
         }
     }

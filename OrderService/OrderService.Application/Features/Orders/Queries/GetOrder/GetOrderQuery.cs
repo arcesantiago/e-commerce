@@ -21,7 +21,7 @@ namespace OrderService.Application.Features.Orders.Queries.GetOrder
 
         public async Task<OrderVm> Handle(GetOrderQuery request, CancellationToken cancellationToken)
         {
-            var order = await _repository.GetByAsync(x => x.Id == request.Id, new() { x => x.Items}, false);
+            var order = await _repository.GetEntityAsync(x => x.Id == request.Id, new() { x => x.Items}, false);
 
             if (order is null)
                 throw new NotFoundException(nameof(Order), request.Id);

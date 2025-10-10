@@ -35,11 +35,11 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
             };
 
             _repositoryMock
-                .Setup(r => r.GetByIdAsync(1))
+                .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(order);
 
             _repositoryMock
-                .Setup(r => r.UpdateAsync(order))
+                .Setup(r => r.UpdateAsync(order, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(order);
 
             var command = new UpdateOrderStatusCommand(1, OrderStatus.Confirmed);
@@ -50,8 +50,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
             // Assert
             Assert.True(result);
             Assert.Equal(OrderStatus.Confirmed, order.Status);
-            _repositoryMock.Verify(r => r.GetByIdAsync(1), Times.Once);
-            _repositoryMock.Verify(r => r.UpdateAsync(order), Times.Once);
+            _repositoryMock.Verify(r => r.FindAsync(1, It.IsAny<CancellationToken>()), Times.Once);
+            _repositoryMock.Verify(r => r.UpdateAsync(order, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
         {
             // Arrange
             _repositoryMock
-                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Order)null!);
 
             var command = new UpdateOrderStatusCommand(99, OrderStatus.Confirmed);
@@ -68,8 +68,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _handler.Handle(command, CancellationToken.None));
 
-            _repositoryMock.Verify(r => r.GetByIdAsync(99), Times.Once);
-            _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Order>()), Times.Never);
+            _repositoryMock.Verify(r => r.FindAsync(99, It.IsAny<CancellationToken>()), Times.Once);
+            _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Order>(), It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace OrderService.Infrastructure.Services
 
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadFromJsonAsync<ProductSnapshot>();
+            return await response.Content.ReadFromJsonAsync<ProductSnapshot>() ?? new ProductSnapshot();
         }
     }
 }

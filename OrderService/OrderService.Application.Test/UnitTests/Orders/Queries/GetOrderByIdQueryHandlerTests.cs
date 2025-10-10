@@ -45,9 +45,12 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             };
 
             _repositoryMock
-                .Setup(r => r.GetByAsync(It.IsAny<Expression<Func<Order, bool>>>(),
-                It.IsAny<List<Expression<Func<Order, object>>>>(),
-                false))
+                .Setup(r => r.GetEntityAsync(
+                    It.IsAny<Expression<Func<Order, bool>>>(),
+                    It.IsAny<List<Expression<Func<Order, object>>>>(),
+                    false,
+                    It.IsAny<CancellationToken>()
+                    ))
                 .ReturnsAsync(order);
 
             _mapperMock
@@ -63,7 +66,12 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             Assert.NotNull(result);
             Assert.Equal(orderVm.Id, result.Id);
             Assert.Equal(orderVm.CustomerId, result.CustomerId);
-            _repositoryMock.Verify(r => r.GetByAsync(It.IsAny<Expression<Func<Order, bool>>>(), It.IsAny<List<Expression<Func<Order, object>>>>(), false), Times.Once);
+            _repositoryMock.Verify(r => r.GetEntityAsync(
+                It.IsAny<Expression<Func<Order, bool>>>(), 
+                It.IsAny<List<Expression<Func<Order, object>>>>(), 
+                false, 
+                It.IsAny<CancellationToken>()
+                ), Times.Once);
             _mapperMock.Verify(m => m.Map<OrderVm>(order), Times.Once);
         }
 
@@ -72,10 +80,11 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
         {
             // Arrange
             _repositoryMock
-                .Setup(r => r.GetByAsync(
+                .Setup(r => r.GetEntityAsync(
                 It.IsAny<Expression<Func<Order, bool>>>(),
                 It.IsAny<List<Expression<Func<Order, object>>>>(),
-                false
+                false, 
+                It.IsAny<CancellationToken>()
             ))
                 .ReturnsAsync((Order)null!);
 
@@ -85,9 +94,12 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _handler.Handle(query, CancellationToken.None));
 
-            _repositoryMock.Verify(r => r.GetByAsync(It.IsAny<Expression<Func<Order, bool>>>(),
+            _repositoryMock.Verify(r => r.GetEntityAsync(
+                It.IsAny<Expression<Func<Order, bool>>>(),
                 It.IsAny<List<Expression<Func<Order, object>>>>(),
-                false), Times.Once);
+                false, 
+                It.IsAny<CancellationToken>()
+                ), Times.Once);
             _mapperMock.Verify(m => m.Map<OrderVm>(It.IsAny<Order>()), Times.Never);
         }
     }

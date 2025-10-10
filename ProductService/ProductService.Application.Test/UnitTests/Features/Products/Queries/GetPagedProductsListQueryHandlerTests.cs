@@ -40,13 +40,14 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
             var pagedProducts = new PagedResult<Product>(products, rowsCount: 2, currentPage: 1, pageSize: 10);
 
             _productRepositoryMock
-                .Setup(r => r.GetPaginatedAsync(
+                .Setup(r => r.GetListPaginatedAsync(
                     It.IsAny<int>(),
                     It.IsAny<int>(),
                     It.IsAny<Expression<Func<Product, bool>>>(),
                     It.IsAny<Func<IQueryable<Product>, IOrderedQueryable<Product>>>(),
                     It.IsAny<List<Expression<Func<Product, object>>>>(),
-                    It.IsAny<bool>()
+                    It.IsAny<bool>(),
+                    It.IsAny<CancellationToken>()
                 ))
                 .ReturnsAsync(pagedProducts);
 
@@ -71,13 +72,14 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
             var pagedProducts = new PagedResult<Product>(products, rowsCount: 0, currentPage: 1, pageSize: 10);
 
             _productRepositoryMock
-                .Setup(r => r.GetPaginatedAsync(
+                .Setup(r => r.GetListPaginatedAsync(
                     It.IsAny<int>(),
                     It.IsAny<int>(),
                     It.IsAny<Expression<Func<Product, bool>>>(),
                     It.IsAny<Func<IQueryable<Product>, IOrderedQueryable<Product>>>(),
                     It.IsAny<List<Expression<Func<Product, object>>>>(),
-                    It.IsAny<bool>()
+                    It.IsAny<bool>(),
+                    It.IsAny<CancellationToken>()
                 ))
                 .ReturnsAsync(pagedProducts);
 

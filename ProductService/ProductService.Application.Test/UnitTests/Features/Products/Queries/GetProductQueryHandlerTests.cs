@@ -6,6 +6,7 @@ using ProductService.Application.Exceptions;
 using ProductService.Application.Features.Products.Queries.GetProduct;
 using ProductService.Application.Mapping;
 using ProductService.Domain;
+using System.Linq.Expressions;
 
 namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
 {
@@ -39,7 +40,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
             };
 
             _productRepositoryMock
-                .Setup(r => r.GetByIdAsync(1))
+                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(product);
 
             var handler = new GetProductQueryHandler(_mapper, _productRepositoryMock.Object);
@@ -62,7 +63,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
         {
             // Arrange
             _productRepositoryMock
-                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product)null!);
 
             var handler = new GetProductQueryHandler(_mapper, _productRepositoryMock.Object);

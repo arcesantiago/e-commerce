@@ -23,7 +23,7 @@ namespace ProductService.Application.Features.Products.Commands.UpdateProduct
 
         public async Task<Unit> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
-            var productToUpdate = await _productRepository.GetByIdAsync(request.UpdateProductCommandRequest.Id);
+            var productToUpdate = await _productRepository.FindAsync(request.UpdateProductCommandRequest.Id);
 
             if (productToUpdate is null)
             {

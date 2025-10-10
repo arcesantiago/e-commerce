@@ -18,7 +18,7 @@ namespace OrderService.Application.Features.Orders.Queries.GetOrders
 
         public async Task<List<OrdersVm>> Handle(GetOrdersQuery request, CancellationToken cancellationToken)
         {
-            var orders = await _repository.GetAsync(includes: new() { x => x.Items }, disableTracking: false);
+            var orders = await _repository.GetListAsync(includes: new() { x => x.Items }, disableTracking: false);
 
             return _mapper.Map<List<OrdersVm>>(orders);
         }

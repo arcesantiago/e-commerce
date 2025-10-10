@@ -5,6 +5,7 @@ using ProductService.Application.Contracts.Persistence;
 using ProductService.Application.Exceptions;
 using ProductService.Application.Features.Products.Commands.DeleteProduct;
 using ProductService.Domain;
+using System.Linq.Expressions;
 
 namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
 {
@@ -25,11 +26,11 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
             // Arrange
             var existingProduct = new Product { Id = 1, Description = "To Delete", Price = 10, Stock = 2 };
             _productRepositoryMock
-                .Setup(r => r.GetByIdAsync(1))
+                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(existingProduct);
 
             _productRepositoryMock
-                .Setup(r => r.DeleteAsync(existingProduct))
+                .Setup(r => r.DeleteAsync(existingProduct, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             var handler = new DeleteProductCommandHandler(
@@ -44,7 +45,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
 
             // Assert
             Assert.Equal(Unit.Value, result);
-            _productRepositoryMock.Verify(r => r.DeleteAsync(existingProduct), Times.Once);
+            _productRepositoryMock.Verify(r => r.DeleteAsync(existingProduct, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact(DisplayName = "Handle should throw NotFoundException when product does not exist")]
@@ -52,7 +53,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
         {
             // Arrange
             _productRepositoryMock
-                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product)null!);
 
             var handler = new DeleteProductCommandHandler(

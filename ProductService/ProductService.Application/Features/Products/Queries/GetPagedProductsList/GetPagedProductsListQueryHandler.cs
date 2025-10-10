@@ -20,7 +20,7 @@ namespace ProductService.Application.Features.Products.Queries.GetPagedProductsL
 
         public async Task<PagedResult<PagedProductsListVm>> Handle(GetPagedProductsListQuery request, CancellationToken cancellationToken)
         {
-            var results = await _productRepository.GetPaginatedAsync(request.CurrentPage, request.PageSize, disableTracking: false);
+            var results = await _productRepository.GetListPaginatedAsync(request.CurrentPage, request.PageSize, disableTracking: false);
 
             return _mapper.Map<PagedResult<PagedProductsListVm>>(results);
         }
