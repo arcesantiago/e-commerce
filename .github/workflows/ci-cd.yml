@@ -22,7 +22,7 @@ jobs:
 
       - name: Configurar Entorno de Pruebas (Docker Compose Multi-DB)
         run: |
-          # 1. Crear el docker-compose.test.yml
+          # 1. Crear el docker-compose.test.yml (Sin cambios)
           cat <<EOF > docker-compose.test.yml
           version: '3.8'
           services:
@@ -34,45 +34,41 @@ jobs:
                 POSTGRES_DB: order
               ports:
                 - "5432:5432"
-              healthcheck: # 🔑 Docker Compose usará esto para el comando 'wait'
+              healthcheck: # 🔑 Configuración de 50s de espera total
                 test: ["CMD", "pg_isready", "-U", "postgres"]
                 interval: 5s
                 timeout: 5s
-                retries: 10 # 50 segundos de espera total
+                retries: 10 
           EOF
           
           echo "Levantando contenedor de PostgreSQL..."
           # 2. Levantar el servicio SOLO 'postgres-test'
-          # Esto evita que Docker Compose intente levantar servicios de producción.
           docker compose -f docker-compose.test.yml up -d --force-recreate postgres-test 
           
           # 3. Esperar al Healthcheck de Docker
           echo "Esperando que el servicio 'postgres-test' esté saludable (máx. 50s)..."
-          # 'wait' se detiene hasta que el healthcheck pasa
-          docker compose -f docker-compose.test.yml wait postgres-test --timeout 60 
-
+          # 🔑 CAMBIO CLAVE: Quitamos --timeout para compatibilidad.
+          docker compose -f docker-compose.test.yml wait postgres-test
+          
       - name: Crear Base de Datos 'product'
-        # Ahora que el contenedor está saludable, creamos la segunda DB.
+        # Ahora que el wait terminó, el contenedor está listo para recibir comandos.
         run: |
-          # Usamos la DB inicial 'order' para ejecutar el comando de creación
           docker compose exec postgres-test psql -U postgres -d order -c "CREATE DATABASE product;" 
         env:
-          PGPASSWORD: Romari0! # Se usa para la autenticación Psql
+          PGPASSWORD: Romari0!
 
       - name: Ejecutar Tests para ProductService (Integración)
         run: |
-          # 🔑 Inyectamos la variable de entorno 'Testing'
           ASPNETCORE_ENVIRONMENT=Testing \
           dotnet test ProductService/ProductService.sln --configuration Release --verbosity normal
 
       - name: Ejecutar Tests para OrderService (Integración)
         run: |
-          # 🔑 Inyectamos la variable de entorno 'Testing'
           ASPNETCORE_ENVIRONMENT=Testing \
           dotnet test OrderService/OrderService.sln --configuration Release --verbosity normal
           
       - name: Limpiar Contenedor de Pruebas
-        if: always() # Garantiza la limpieza incluso si los tests fallan
+        if: always()
         run: docker compose -f docker-compose.test.yml down -v
 
       # --- El resto del flujo de Build/Deploy permanece igual ---
