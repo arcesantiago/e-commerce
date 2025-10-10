@@ -69,12 +69,10 @@ jobs:
 
       - name: Ejecutar Tests para ProductService (Integración)
         run: |
-          ASPNETCORE_ENVIRONMENT=Testing \
           dotnet test ProductService/ProductService.sln --configuration Release --verbosity normal
 
       - name: Ejecutar Tests para OrderService (Integración)
         run: |
-          ASPNETCORE_ENVIRONMENT=Testing \
           dotnet test OrderService/OrderService.sln --configuration Release --verbosity normal
           
       - name: Limpiar Contenedor de Pruebas
