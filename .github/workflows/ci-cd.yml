@@ -40,7 +40,7 @@ jobs:
                 retries: 5
           EOF
           
-          docker compose -f docker-compose.test.yml up -d
+          docker compose -f docker-compose.test.yml up -d --force-recreate
           
           echo "Esperando que el contenedor se registre..."
           sleep 5 
