@@ -42,17 +42,17 @@ jobs:
           
           docker compose -f docker-compose.test.yml up -d --force-recreate
           
-          echo "Esperando que el contenedor se registre..."
-          sleep 5 
-          
-          echo "Verificando el estado del contenedor..."
-          
-          until docker ps --filter "name=postgres-test" --filter "status=running" --format "{{.Names}}" | grep -q "postgres-test"; do
-            echo "Contenedor 'postgres-test' no está en ejecución. Esperando..."
-            sleep 5
-          done
-          
-          echo "Contenedor en ejecución. Esperando que PostgreSQL inicie la DB..."
+          echo "Esperando 20 segundos para que el contenedor inicie completamente..."
+          sleep 20 
+
+          if ! docker ps --filter name=postgres-test | grep -q postgres-test; then
+             echo "ERROR: El contenedor 'postgres-test' NO se pudo iniciar. Imprimiendo logs de Docker..."
+             # Esto nos dirá si el contenedor falló al iniciarse.
+             docker compose -f docker-compose.test.yml logs postgres-test
+             exit 1 
+          fi
+
+          echo "Contenedor verificado. Esperando la inicialización de la base de datos..."
           
           until docker exec postgres-test pg_isready -U postgres -d order; do
             echo "PostgreSQL no está listo, esperando..."
