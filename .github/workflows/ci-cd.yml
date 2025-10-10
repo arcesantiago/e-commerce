@@ -20,9 +20,9 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Configurar Entorno de Pruebas (Docker Compose Multi-DB)
+      - name: Configurar Entorno de Pruebas (Solución Definitiva)
         run: |
-          # 1. Crear el docker-compose.test.yml (Sin cambios)
+          # 1. Crear el docker-compose.test.yml (Ajustando el healthcheck)
           cat <<EOF > docker-compose.test.yml
           version: '3.8'
           services:
@@ -34,25 +34,23 @@ jobs:
                 POSTGRES_DB: order
               ports:
                 - "5432:5432"
-              healthcheck: # 🔑 Configuración de 50s de espera total
-                test: ["CMD", "pg_isready", "-U", "postgres"]
+              healthcheck: 
+                # 🔑 CAMBIO CLAVE: Especificar la base de datos (-d order) y más retries.
+                test: ["CMD", "pg_isready", "-U", "postgres", "-d", "order"]
                 interval: 5s
                 timeout: 5s
-                retries: 10 
+                retries: 12 # Aumentamos a 12 retries (60 segundos)
           EOF
           
           echo "Levantando contenedor de PostgreSQL..."
-          # 2. Levantar el servicio SOLO 'postgres-test'
           docker compose -f docker-compose.test.yml up -d --force-recreate postgres-test 
           
-          # 3. Esperar al Healthcheck de Docker
-          echo "Esperando que el servicio 'postgres-test' esté saludable (máx. 50s)..."
-          # 🔑 CAMBIO CLAVE: Quitamos --timeout para compatibilidad.
+          # 3. Esperar al Healthcheck de Docker (Ahora espera 60 segundos)
+          echo "Esperando que el servicio 'postgres-test' esté saludable (máx. 60s)..."
           docker compose -f docker-compose.test.yml wait postgres-test
           
-      - name: Crear Base de Datos 'product'
-        # Ahora que el wait terminó, el contenedor está listo para recibir comandos.
-        run: |
+          # 4. Crear Base de Datos 'product'
+          echo "Creando base de datos 'product'..."
           docker compose exec postgres-test psql -U postgres -d order -c "CREATE DATABASE product;" 
         env:
           PGPASSWORD: Romari0!
