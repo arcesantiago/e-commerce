@@ -16,9 +16,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
 builder.Configuration
     .AddJsonFile($"appsettings.json", optional: true)
-    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true);
+    .AddJsonFile($"appsettings.{environment}.json", optional: true);
 
 builder.Configuration.AddEnvironmentVariables();
 
@@ -33,6 +35,25 @@ builder.Services.AddHealthChecks()
         name: "product",
         failureStatus: HealthStatus.Degraded,
         tags: new[] { "ready", "database" });
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DefaultCors", policy =>
+    {
+        if (environment == "Development")
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
+        else
+        {
+            policy.WithOrigins("http://54.175.121.198:8082")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -55,6 +76,8 @@ using (var scope = app.Services.CreateScope())
 
     DbInitializer.Seed(db);
 }
+
+app.UseCors("DefaultCors");
 
 app.UseMiddleware<ExceptionMiddleware>();
 
