@@ -7,20 +7,13 @@ namespace ProductService.Application.Features.Products.Queries.GetPagedProductsL
 {
     public record GetPagedProductsListQuery(int CurrentPage, int PageSize) : IRequest<PagedResult<PagedProductsListVm>>;
 
-    public class GetPagedProductsListQueryHandler : IRequestHandler<GetPagedProductsListQuery, PagedResult<PagedProductsListVm>>
+    public class GetPagedProductsListQueryHandler(IMapper mapper, IProductUnitOfWork productUnitOfWork) : IRequestHandler<GetPagedProductsListQuery, PagedResult<PagedProductsListVm>>
     {
-        private readonly IMapper _mapper;
-        private readonly IProductRepository _productRepository;
-
-        public GetPagedProductsListQueryHandler(IMapper mapper, IProductRepository productRepository)
-        {
-            _mapper = mapper;
-            _productRepository = productRepository;
-        }
-
+        private readonly IMapper _mapper = mapper;
+        private readonly IProductUnitOfWork _productUnitOfWork = productUnitOfWork;
         public async Task<PagedResult<PagedProductsListVm>> Handle(GetPagedProductsListQuery request, CancellationToken cancellationToken)
         {
-            var results = await _productRepository.GetListPaginatedAsync(request.CurrentPage, request.PageSize, disableTracking: false);
+            var results = await _productUnitOfWork.Products.GetListPaginatedAsync(request.CurrentPage, request.PageSize, disableTracking: false, cancellationToken: cancellationToken);
 
             return _mapper.Map<PagedResult<PagedProductsListVm>>(results);
         }

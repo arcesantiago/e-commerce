@@ -7,20 +7,14 @@ using ProductService.Domain;
 namespace ProductService.Application.Features.Products.Commands.DeleteProduct
 {
     public record DeleteProductCommand(int Id) : IRequest<Unit>;
-    public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand, Unit>
+    public class DeleteProductCommandHandler(ILogger<DeleteProductCommandHandler> logger, IProductUnitOfWork productUnitOfWork) : IRequestHandler<DeleteProductCommand, Unit>
     {
-        private readonly ILogger<DeleteProductCommandHandler> _logger;
-        private readonly IProductRepository _productRepository;
-
-        public DeleteProductCommandHandler(ILogger<DeleteProductCommandHandler> logger, IProductRepository productRepository)
-        {
-            _logger = logger;
-            _productRepository = productRepository;
-        }
+        private readonly ILogger<DeleteProductCommandHandler> _logger = logger;
+        private readonly IProductUnitOfWork _productUnitOfWork = productUnitOfWork;
 
         public async Task<Unit> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
         {
-            var productToDelete = await _productRepository.FindAsync(request.Id);
+            var productToDelete = await _productUnitOfWork.Products.FindAsync(request.Id);
 
             if (productToDelete is null)
             {
@@ -28,7 +22,8 @@ namespace ProductService.Application.Features.Products.Commands.DeleteProduct
                 throw new NotFoundException(nameof(Product), request.Id);
             }
 
-            await _productRepository.DeleteAsync(productToDelete);
+            _productUnitOfWork.Products.Delete(productToDelete);
+            await _productUnitOfWork.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation($"The product {request.Id} was successfully removed");
 

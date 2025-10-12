@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using OrderService.Domain;
 using OrderService.Infrastructure.Percistence;
 using OrderService.Infrastructure.Repositories;
 using OrderService.Infrastructure.Test.IntegrationTests.Utils;
@@ -10,7 +9,7 @@ namespace OrderService.Infrastructure.Test.IntegrationTests.Fixtures
     public class OrderDbFixture : IDisposable
     {
         public OrderDbContext Context { get; }
-        public RepositoryBase<Order> OrderRepository { get; }
+        public OrderUnitOfWork UnitOfWork { get; }
 
         public OrderDbFixture()
         {
@@ -24,7 +23,9 @@ namespace OrderService.Infrastructure.Test.IntegrationTests.Fixtures
             Context.Database.EnsureDeleted();
             Context.Database.EnsureCreated();
 
-            OrderRepository = new RepositoryBase<Order>(Context, Context.Orders!);
+            var orderRepository = new OrderRepository(Context);
+            var orderItemRepository = new OrderItemRepository(Context);
+            UnitOfWork = new OrderUnitOfWork(Context, orderRepository, orderItemRepository);
         }
 
         public void Dispose() => Context.Dispose();

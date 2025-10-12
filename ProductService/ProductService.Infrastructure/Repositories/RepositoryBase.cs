@@ -76,18 +76,16 @@ namespace ProductService.Infrastructure.Repositories
         public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
         {
             await _dbSet.AddAsync(entity, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
             return entity;
         }
 
-        public async Task<T> UpdateAsync(T entity, CancellationToken cancellationToken = default)
+        public T Update(T entity)
         {
             _context.Entry(entity).State = EntityState.Modified;
-            await _context.SaveChangesAsync(cancellationToken);
             return entity;
         }
 
-        public async Task<T> UpdateFieldsAsync(T entity, Expression<Func<T, object>>[] propertiesToUpdate, CancellationToken cancellationToken = default)
+        public T UpdateFields(T entity, Expression<Func<T, object>>[] propertiesToUpdate, CancellationToken cancellationToken = default)
         {
             UpdateFieldValidator.Validate(propertiesToUpdate);
 
@@ -98,7 +96,6 @@ namespace ProductService.Infrastructure.Repositories
                 _context.Entry(entity).Property(property).IsModified = true;
             }
 
-            await _context.SaveChangesAsync(cancellationToken);
             return entity;
         }
 
@@ -108,10 +105,9 @@ namespace ProductService.Infrastructure.Repositories
             return await updateAction(query);
         }
 
-        public async Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
+        public void Delete(T entity)
         {
             _dbSet.Remove(entity);
-            await _context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<int> DeleteManyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
@@ -127,7 +123,6 @@ namespace ProductService.Infrastructure.Repositories
             .FromSqlInterpolated(sql)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
-
         }
 
         public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)

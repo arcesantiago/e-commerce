@@ -14,7 +14,7 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
     {
         private readonly Mock<ILogger<CreateOrderCommandHandler>> _loggerMock;
         private readonly Mock<IMapper> _mapperMock;
-        private readonly Mock<IOrderRepository> _repositoryMock;
+        private readonly Mock<IOrderUnitOfWork> _orderUnitOfWork;
         private readonly Mock<IProductServiceClient> _productServiceClientMock;
         private readonly CreateOrderCommandHandler _handler;
 
@@ -22,13 +22,13 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
         {
             _loggerMock = new Mock<ILogger<CreateOrderCommandHandler>>();
             _mapperMock = new Mock<IMapper>();
-            _repositoryMock = new Mock<IOrderRepository>();
+            _orderUnitOfWork = new Mock<IOrderUnitOfWork>();
             _productServiceClientMock = new Mock<IProductServiceClient>();
 
             _handler = new CreateOrderCommandHandler(
                 _loggerMock.Object,
                 _mapperMock.Object,
-                _repositoryMock.Object,
+                _orderUnitOfWork.Object,
                 _productServiceClientMock.Object
             );
         }
@@ -64,8 +64,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
                 .Setup(p => p.GetByIdAsync(1))
                 .ReturnsAsync(new ProductSnapshot { Id = 1, Stock = 5, Price = 50 });
 
-            _repositoryMock
-                .Setup(r => r.AddAsync(It.IsAny<Order>(), It.IsAny<CancellationToken>()))
+            _orderUnitOfWork
+                .Setup(r => r.Orders.AddAsync(It.IsAny<Order>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(order);
 
             var command = new CreateOrderCommand(request);
@@ -77,7 +77,7 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
             Assert.Equal(10, result);
             Assert.Equal(OrderStatus.Pending, order.Status);
             Assert.Equal(100, order.TotalAmount);
-            _repositoryMock.Verify(r => r.AddAsync(order, default), Times.Once);
+            _orderUnitOfWork.Verify(r => r.Orders.AddAsync(order, default), Times.Once);
         }
 
         [Fact]
@@ -116,7 +116,7 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
             await Assert.ThrowsAsync<ValidationException>(() =>
                 _handler.Handle(command, CancellationToken.None));
 
-            _repositoryMock.Verify(r => r.AddAsync(It.IsAny<Order>(), It.IsAny<CancellationToken>()), Times.Never);
+            _orderUnitOfWork.Verify(r => r.Orders.AddAsync(It.IsAny<Order>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -155,7 +155,7 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
             await Assert.ThrowsAsync<ValidationException>(() =>
                 _handler.Handle(command, CancellationToken.None));
 
-            _repositoryMock.Verify(r => r.AddAsync(It.IsAny<Order>(), It.IsAny<CancellationToken>()), Times.Never);
+            _orderUnitOfWork.Verify(r => r.Orders.AddAsync(It.IsAny<Order>(), It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }

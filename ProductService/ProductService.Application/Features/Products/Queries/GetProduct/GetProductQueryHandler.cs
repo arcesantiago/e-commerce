@@ -7,20 +7,13 @@ using ProductService.Domain;
 namespace ProductService.Application.Features.Products.Queries.GetProduct
 {
     public record GetProductQuery(int Id) : IRequest<ProductVm>;
-    public class GetProductQueryHandler : IRequestHandler<GetProductQuery, ProductVm>
+    public class GetProductQueryHandler(IMapper mapper, IProductUnitOfWork productUnitOfWork) : IRequestHandler<GetProductQuery, ProductVm>
     {
-        private readonly IMapper _mapper;
-        private readonly IProductRepository _productRepository;
-
-        public GetProductQueryHandler(IMapper mapper, IProductRepository productRepository)
-        {
-            _mapper = mapper;
-            _productRepository = productRepository;
-        }
-
+        private readonly IMapper _mapper = mapper;
+        private readonly IProductUnitOfWork _productUnitOfWork = productUnitOfWork;
         public async Task<ProductVm> Handle(GetProductQuery request, CancellationToken cancellationToken)
         {
-            var product = await _productRepository.FindAsync(request.Id);
+            var product = await _productUnitOfWork.Products.FindAsync(request.Id, cancellationToken);
 
             if (product is null)
                 throw new NotFoundException(nameof(Product), request.Id);

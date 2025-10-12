@@ -8,20 +8,14 @@ using OrderService.Domain.Enums;
 namespace OrderService.Application.Features.Orders.Commands.UpdateOrderStatus
 {
     public record UpdateOrderStatusCommand(int Id, OrderStatus Status) : IRequest<bool>;
-    public class UpdateOrderStatusCommandHandler : IRequestHandler<UpdateOrderStatusCommand, bool>
+    public class UpdateOrderStatusCommandHandler(IOrderUnitOfWork orderUnitOfWork, ILogger<UpdateOrderStatusCommandHandler> logger) : IRequestHandler<UpdateOrderStatusCommand, bool>
     {
-        private readonly IOrderRepository _repository;
-        private readonly ILogger<UpdateOrderStatusCommandHandler> _logger;
-
-        public UpdateOrderStatusCommandHandler(IOrderRepository repository, ILogger<UpdateOrderStatusCommandHandler> logger)
-        {
-            _repository = repository;
-            _logger = logger;
-        }
+        private readonly IOrderUnitOfWork _orderUnitOfWork = orderUnitOfWork;
+        private readonly ILogger<UpdateOrderStatusCommandHandler> _logger = logger;
 
         public async Task<bool> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
         {
-            var order = await _repository.FindAsync(request.Id);
+            var order = await _orderUnitOfWork.Orders.FindAsync(request.Id);
             if (order is null)
             {
                 _logger.LogWarning($"Order {request.Id} not found");
@@ -29,7 +23,8 @@ namespace OrderService.Application.Features.Orders.Commands.UpdateOrderStatus
             }
 
             order.Status = request.Status;
-            await _repository.UpdateAsync(order);
+            _orderUnitOfWork.Orders.Update(order);
+            await _orderUnitOfWork.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation($"The order {order.Id} was updated successfully");
             return true;

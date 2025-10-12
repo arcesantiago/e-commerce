@@ -27,9 +27,9 @@ namespace OrderService.API.Controllers
         [HttpGet("{id}", Name = "GetOrder")]
         [ProducesResponseType(typeof(OrderVm), (int)HttpStatusCode.OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<OrderVm>> GetOrder([FromRoute] int id)
+        public async Task<ActionResult<OrderVm>> GetOrder([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            return Ok(await _mediator.Send(new GetOrderQuery(id)));
+            return Ok(await _mediator.Send(new GetOrderQuery(id), cancellationToken));
         }
 
         /// <summary>
@@ -38,9 +38,9 @@ namespace OrderService.API.Controllers
         /// <returns>list of orders</returns>
         [HttpGet(Name = "GetOrders")]
         [ProducesResponseType(typeof(List<OrdersVm>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<List<OrdersVm>>> GetOrders()
+        public async Task<ActionResult<List<OrdersVm>>> GetOrders(CancellationToken cancellationToken = default)
         {
-            return Ok(await _mediator.Send(new GetOrdersQuery()));
+            return Ok(await _mediator.Send(new GetOrdersQuery(), cancellationToken));
         }
 
         /// <summary>
@@ -50,9 +50,9 @@ namespace OrderService.API.Controllers
         /// <returns>order id</returns>
         [HttpPost(Name = "CreateOrder")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<int>> CreateOrder([FromBody] CreateOrderCommandRequest request)
+        public async Task<ActionResult<int>> CreateOrder([FromBody] CreateOrderCommandRequest request, CancellationToken cancellationToken = default)
         {
-            return Ok(await _mediator.Send(new CreateOrderCommand(request)));
+            return Ok(await _mediator.Send(new CreateOrderCommand(request), cancellationToken));
         }
 
         /// <summary>
@@ -64,9 +64,9 @@ namespace OrderService.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult> UpdateOrderStatus([FromBody] UpdateOrderStatusCommand request)
+        public async Task<ActionResult> UpdateOrderStatus([FromBody] UpdateOrderStatusCommand request, CancellationToken cancellationToken = default)
         {
-            await _mediator.Send(request);
+            await _mediator.Send(request, cancellationToken);
 
             return NoContent();
         }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using ProductService.Domain;
 using ProductService.Infrastructure.Percistence;
 using ProductService.Infrastructure.Repositories;
 using ProductService.Infrastructure.Test.IntegrationTests.Utils;
@@ -10,7 +9,7 @@ namespace ProductService.Infrastructure.Test.IntegrationTests.Fixtures
     public class ProductDbFixture : IDisposable
     {
         public ProductDbContext Context { get; }
-        public RepositoryBase<Product> ProductRepository { get; }
+        public ProductUnitOfWork UnitOfWork { get; }
 
         public ProductDbFixture()
         {
@@ -24,7 +23,8 @@ namespace ProductService.Infrastructure.Test.IntegrationTests.Fixtures
             Context.Database.EnsureDeleted();
             Context.Database.EnsureCreated();
 
-            ProductRepository = new RepositoryBase<Product>(Context, Context.Products!);
+            var productRepository = new ProductRepository(Context);
+            UnitOfWork = new ProductUnitOfWork(Context, productRepository);
         }
 
         public void Dispose() => Context.Dispose();

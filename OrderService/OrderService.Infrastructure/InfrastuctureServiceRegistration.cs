@@ -24,6 +24,7 @@ namespace OrderService.Infrastructure
             services.AddScoped(typeof(IWriteRepository<>), typeof(RepositoryBase<>));
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            services.AddScoped<IOrderUnitOfWork, OrderUnitOfWork>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 

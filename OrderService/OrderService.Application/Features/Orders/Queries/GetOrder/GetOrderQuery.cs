@@ -7,21 +7,13 @@ using OrderService.Domain;
 namespace OrderService.Application.Features.Orders.Queries.GetOrder
 {
     public record GetOrderQuery(int Id) : IRequest<OrderVm>;
-    public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderQuery, OrderVm>
+    public class GetOrderByIdQueryHandler(IMapper mapper, IOrderUnitOfWork orderUnitOfWork) : IRequestHandler<GetOrderQuery, OrderVm>
     {
-        private readonly IMapper _mapper;
-        private readonly IOrderRepository _repository;
-
-
-        public GetOrderByIdQueryHandler(IMapper mapper, IOrderRepository repository)
-        {
-            _repository = repository;
-            _mapper = mapper;
-        }
-
+        private readonly IMapper _mapper = mapper;
+        private readonly IOrderUnitOfWork _orderUnitOfWork = orderUnitOfWork;
         public async Task<OrderVm> Handle(GetOrderQuery request, CancellationToken cancellationToken)
         {
-            var order = await _repository.GetEntityAsync(x => x.Id == request.Id, new() { x => x.Items}, false);
+            var order = await _orderUnitOfWork.Orders.GetEntityAsync(x => x.Id == request.Id, new() { x => x.Items}, false, cancellationToken);
 
             if (order is null)
                 throw new NotFoundException(nameof(Order), request.Id);
@@ -29,5 +21,4 @@ namespace OrderService.Application.Features.Orders.Queries.GetOrder
             return _mapper.Map<OrderVm>(order);
         }
     }
-
 }

@@ -1,6 +1,5 @@
 ﻿using OrderService.Domain;
 using OrderService.Domain.Enums;
-using OrderService.Infrastructure.Repositories;
 using OrderService.Infrastructure.Test.IntegrationTests.Fixtures;
 using System.Linq.Expressions;
 
@@ -9,12 +8,10 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
     public class OrderRepositoryTest : IClassFixture<OrderDbFixture>
     {
         private readonly OrderDbFixture _orderDbFixture;
-        private readonly RepositoryBase<Order> _orderRepository;
 
         public OrderRepositoryTest(OrderDbFixture fixture)
         {
             _orderDbFixture = fixture;
-            _orderRepository = fixture.OrderRepository;
         }
 
         [Fact]
@@ -34,11 +31,12 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
                 }
             };
 
-            var result = await _orderRepository.AddAsync(order);
+            var result = await _orderDbFixture.UnitOfWork.Orders.AddAsync(order);
+            await _orderDbFixture.UnitOfWork.SaveChangesAsync();
 
             Assert.NotNull(result);
             Assert.Single(result.Items);
-            Assert.Equal(1, await _orderRepository.CountAsync());
+            Assert.Equal(1, await _orderDbFixture.UnitOfWork.Orders.CountAsync());
             Assert.Equal(1, _orderDbFixture.Context.Set<OrderItem>().Count());
         }
 
@@ -49,7 +47,7 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
 
             var order = await SeedOrderAsync();
 
-            var result = await _orderRepository.FindAsync(order.Id);
+            var result = await _orderDbFixture.UnitOfWork.Orders.FindAsync(order.Id);
 
             Assert.NotNull(result);
             Assert.Equal(order.CustomerId, result!.CustomerId);
@@ -63,7 +61,7 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
             await SeedOrderAsync();
             await SeedOrderAsync();
 
-            var result = await _orderRepository.GetListAsync();
+            var result = await _orderDbFixture.UnitOfWork.Orders.GetListAsync();
 
             Assert.Equal(2, result.Count);
         }
@@ -76,7 +74,7 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
             await SeedOrderAsync("CUST-1");
             await SeedOrderAsync("CUST-2");
 
-            var result = await _orderRepository.GetListAsync(o => o.CustomerId == "CUST-1");
+            var result = await _orderDbFixture.UnitOfWork.Orders.GetListAsync(o => o.CustomerId == "CUST-1");
 
             Assert.Single(result);
             Assert.Equal("CUST-1", result.First().CustomerId);
@@ -89,7 +87,7 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
 
             var order = await SeedOrderAsync();
 
-            var result = await _orderRepository.GetListAsync(
+            var result = await _orderDbFixture.UnitOfWork.Orders.GetListAsync(
                 predicate: o => o.Id == order.Id,
                 includes: new() { x => x.Items }
             );
@@ -106,7 +104,7 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
 
             var order = await SeedOrderAsync();
 
-            var result = await _orderRepository.GetListAsync(
+            var result = await _orderDbFixture.UnitOfWork.Orders.GetListAsync(
                 predicate: o => o.Id == order.Id,
                 includes: new List<Expression<Func<Order, object>>>
                 {
@@ -127,10 +125,11 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
             var order = await SeedOrderAsync();
             order.Status = OrderStatus.Confirmed;
 
-            var updated = await _orderRepository.UpdateAsync(order);
+            var updated = _orderDbFixture.UnitOfWork.Orders.Update(order);
+            await _orderDbFixture.UnitOfWork.SaveChangesAsync();
 
             Assert.Equal(OrderStatus.Confirmed, updated.Status);
-            Assert.Equal(OrderStatus.Confirmed, _orderDbFixture.Context.Orders!.First().Status);
+            Assert.Equal(OrderStatus.Confirmed, (await _orderDbFixture.UnitOfWork.Orders.GetListAsync()).First().Status);
         }
 
         [Fact]
@@ -140,9 +139,10 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
 
             var order = await SeedOrderAsync();
 
-            await _orderRepository.DeleteAsync(order);
+            _orderDbFixture.UnitOfWork.Orders.Delete(order);
+            await _orderDbFixture.UnitOfWork.SaveChangesAsync();
 
-            Assert.Empty(await _orderRepository.GetListAsync());
+            Assert.Empty(await _orderDbFixture.UnitOfWork.Orders.GetListAsync());
             Assert.Empty(_orderDbFixture.Context.Set<OrderItem>());
         }
 
@@ -153,7 +153,7 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
 
             var order = await SeedOrderAsync();
 
-            var result = await _orderRepository.GetEntityAsync(o => o.Id == 1, includes: new() { x => x.Items });
+            var result = await _orderDbFixture.UnitOfWork.Orders.GetEntityAsync(o => o.Id == 1, includes: new() { x => x.Items });
 
             Assert.NotNull(result);
             Assert.Equal(order.CustomerId, result!.CustomerId);

@@ -8,14 +8,13 @@ using ProductService.Application.Exceptions;
 using ProductService.Application.Features.Products.Commands.UpdateProduct;
 using ProductService.Application.Mapping;
 using ProductService.Domain;
-using System.Linq.Expressions;
 
 namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
 {
     public class UpdateProductCommandHandlerTests
     {
         private readonly IMapper _mapper;
-        private readonly Mock<IProductRepository> _productRepositoryMock;
+        private readonly Mock<IProductUnitOfWork> _productUnitOfWorkMock;
         private readonly Mock<ILogger<UpdateProductCommandHandler>> _loggerMock;
 
         public UpdateProductCommandHandlerTests()
@@ -27,7 +26,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
             NullLoggerFactory.Instance);
             _mapper = mapperConfig.CreateMapper();
 
-            _productRepositoryMock = new Mock<IProductRepository>();
+            _productUnitOfWorkMock = new Mock<IProductUnitOfWork>();
             _loggerMock = new Mock<ILogger<UpdateProductCommandHandler>>();
         }
 
@@ -36,18 +35,17 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
         {
             // Arrange
             var existingProduct = new Product { Id = 1, Description = "Old Name", Price = 10, Stock = 2 };
-            _productRepositoryMock
-                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _productUnitOfWorkMock
+                .Setup(r => r.Products.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(existingProduct);
 
-            _productRepositoryMock
-                .Setup(r => r.UpdateAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(existingProduct);
+            _productUnitOfWorkMock
+                .Setup(r => r.Products.Update(It.IsAny<Product>()));
 
             var handler = new UpdateProductCommandHandler(
                 _loggerMock.Object,
                 _mapper,
-                _productRepositoryMock.Object
+                _productUnitOfWorkMock.Object
             );
 
             var command = new UpdateProductCommand( new UpdateProductCommandRequest
@@ -66,21 +64,21 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
             Assert.Equal("Updated Name", existingProduct.Description);
             Assert.Equal(15m, existingProduct.Price);
             Assert.Equal(5, existingProduct.Stock);
-            _productRepositoryMock.Verify(r => r.UpdateAsync(existingProduct, It.IsAny<CancellationToken>()), Times.Once);
+            _productUnitOfWorkMock.Verify(r => r.Products.Update(existingProduct), Times.Once);
         }
 
         [Fact(DisplayName = "Handle should throw NotFoundException when product does not exist")]
         public async Task Handle_ShouldThrow_WhenProductNotExists()
         {
             // Arrange
-            _productRepositoryMock
-                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _productUnitOfWorkMock
+                .Setup(r => r.Products.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product)null!);
 
             var handler = new UpdateProductCommandHandler(
                 _loggerMock.Object,
                 _mapper,
-                _productRepositoryMock.Object
+                _productUnitOfWorkMock.Object
             );
 
             var command = new UpdateProductCommand(new UpdateProductCommandRequest

@@ -13,7 +13,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
     public class GetProductQueryHandlerTests
     {
         private readonly IMapper _mapper;
-        private readonly Mock<IProductRepository> _productRepositoryMock;
+        private readonly Mock<IProductUnitOfWork> _productUnitOfWorkMock;
 
         public GetProductQueryHandlerTests()
         {
@@ -24,7 +24,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
             NullLoggerFactory.Instance);
             _mapper = mapperConfig.CreateMapper();
 
-            _productRepositoryMock = new Mock<IProductRepository>();
+            _productUnitOfWorkMock = new Mock<IProductUnitOfWork>();
         }
 
         [Fact(DisplayName = "Handle should return product when exists")]
@@ -39,11 +39,11 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
                 Stock = 5
             };
 
-            _productRepositoryMock
-                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _productUnitOfWorkMock
+                .Setup(r => r.Products.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(product);
 
-            var handler = new GetProductQueryHandler(_mapper, _productRepositoryMock.Object);
+            var handler = new GetProductQueryHandler(_mapper, _productUnitOfWorkMock.Object);
 
             var query = new GetProductQuery(1);
 
@@ -62,11 +62,11 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
         public async Task Handle_ShouldThrow_WhenProductNotExists()
         {
             // Arrange
-            _productRepositoryMock
-                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _productUnitOfWorkMock
+                .Setup(r => r.Products.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product)null!);
 
-            var handler = new GetProductQueryHandler(_mapper, _productRepositoryMock.Object);
+            var handler = new GetProductQueryHandler(_mapper, _productUnitOfWorkMock.Object);
 
             var query = new GetProductQuery(999);
 

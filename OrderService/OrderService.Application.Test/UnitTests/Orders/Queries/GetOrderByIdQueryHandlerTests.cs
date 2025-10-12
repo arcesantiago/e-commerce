@@ -11,15 +11,15 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
 {
     public class GetOrderByIdQueryHandlerTests
     {
-        private readonly Mock<IOrderRepository> _repositoryMock;
+        private readonly Mock<IOrderUnitOfWork> _orderUnitOfWork;
         private readonly Mock<IMapper> _mapperMock;
         private readonly GetOrderByIdQueryHandler _handler;
 
         public GetOrderByIdQueryHandlerTests()
         {
-            _repositoryMock = new Mock<IOrderRepository>();
+            _orderUnitOfWork = new Mock<IOrderUnitOfWork>();
             _mapperMock = new Mock<IMapper>();
-            _handler = new GetOrderByIdQueryHandler(_mapperMock.Object, _repositoryMock.Object);
+            _handler = new GetOrderByIdQueryHandler(_mapperMock.Object, _orderUnitOfWork.Object);
         }
 
         [Fact]
@@ -44,8 +44,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
                 OrderDate = order.OrderDate
             };
 
-            _repositoryMock
-                .Setup(r => r.GetEntityAsync(
+            _orderUnitOfWork
+                .Setup(r => r.Orders.GetEntityAsync(
                     It.IsAny<Expression<Func<Order, bool>>>(),
                     It.IsAny<List<Expression<Func<Order, object>>>>(),
                     false,
@@ -66,7 +66,7 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             Assert.NotNull(result);
             Assert.Equal(orderVm.Id, result.Id);
             Assert.Equal(orderVm.CustomerId, result.CustomerId);
-            _repositoryMock.Verify(r => r.GetEntityAsync(
+            _orderUnitOfWork.Verify(r => r.Orders.GetEntityAsync(
                 It.IsAny<Expression<Func<Order, bool>>>(), 
                 It.IsAny<List<Expression<Func<Order, object>>>>(), 
                 false, 
@@ -79,8 +79,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
         public async Task Handle_ShouldThrowNotFoundException_WhenOrderDoesNotExist()
         {
             // Arrange
-            _repositoryMock
-                .Setup(r => r.GetEntityAsync(
+            _orderUnitOfWork
+                .Setup(r => r.Orders.GetEntityAsync(
                 It.IsAny<Expression<Func<Order, bool>>>(),
                 It.IsAny<List<Expression<Func<Order, object>>>>(),
                 false, 
@@ -94,7 +94,7 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _handler.Handle(query, CancellationToken.None));
 
-            _repositoryMock.Verify(r => r.GetEntityAsync(
+            _orderUnitOfWork.Verify(r => r.Orders.GetEntityAsync(
                 It.IsAny<Expression<Func<Order, bool>>>(),
                 It.IsAny<List<Expression<Func<Order, object>>>>(),
                 false, 

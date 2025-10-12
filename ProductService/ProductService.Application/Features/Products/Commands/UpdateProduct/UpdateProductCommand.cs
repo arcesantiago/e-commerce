@@ -8,22 +8,14 @@ using ProductService.Domain;
 namespace ProductService.Application.Features.Products.Commands.UpdateProduct
 {
     public record UpdateProductCommand(UpdateProductCommandRequest UpdateProductCommandRequest) : IRequest<Unit>;
-    public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Unit>
+    public class UpdateProductCommandHandler(ILogger<UpdateProductCommandHandler> logger, IMapper mapper, IProductUnitOfWork productUnitOfWork) : IRequestHandler<UpdateProductCommand, Unit>
     {
-        private readonly ILogger<UpdateProductCommandHandler> _logger;
-        private readonly IMapper _mapper;
-        private readonly IProductRepository _productRepository;
-
-        public UpdateProductCommandHandler(ILogger<UpdateProductCommandHandler> logger, IMapper mapper, IProductRepository productRepository)
-        {
-            _logger = logger;
-            _mapper = mapper;
-            _productRepository = productRepository;
-        }
-
+        private readonly ILogger<UpdateProductCommandHandler> _logger = logger;
+        private readonly IMapper _mapper = mapper;
+        private readonly IProductUnitOfWork _productUnitOfWork = productUnitOfWork;
         public async Task<Unit> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
-            var productToUpdate = await _productRepository.FindAsync(request.UpdateProductCommandRequest.Id);
+            var productToUpdate = await _productUnitOfWork.Products.FindAsync(request.UpdateProductCommandRequest.Id);
 
             if (productToUpdate is null)
             {
@@ -33,7 +25,8 @@ namespace ProductService.Application.Features.Products.Commands.UpdateProduct
 
             _mapper.Map(request.UpdateProductCommandRequest, productToUpdate, typeof(UpdateProductCommand), typeof(Product));
 
-            await _productRepository.UpdateAsync(productToUpdate);
+            _productUnitOfWork.Products.Update(productToUpdate);
+            await _productUnitOfWork.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation($"The product {request.UpdateProductCommandRequest.Id} was updated successfully");
 

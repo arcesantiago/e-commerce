@@ -22,6 +22,7 @@ namespace ProductService.Infrastructure
             services.AddScoped(typeof(IReadRepository<>), typeof(RepositoryBase<>));
             services.AddScoped(typeof(IWriteRepository<>), typeof(RepositoryBase<>));
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductUnitOfWork, ProductUnitOfWork>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 

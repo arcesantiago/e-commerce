@@ -13,7 +13,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
     public class GetPagedProductsListQueryHandlerTests
     {
         private readonly IMapper _mapper;
-        private readonly Mock<IProductRepository> _productRepositoryMock;
+        private readonly Mock<IProductUnitOfWork> _productUnitOfWorkMock;
 
         public GetPagedProductsListQueryHandlerTests()
         {
@@ -24,7 +24,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
             NullLoggerFactory.Instance);
             _mapper = mapperConfig.CreateMapper();
 
-            _productRepositoryMock = new Mock<IProductRepository>();
+            _productUnitOfWorkMock = new Mock<IProductUnitOfWork>();
         }
 
         [Fact(DisplayName = "Handle should return paged result when products exist")]
@@ -39,8 +39,8 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
 
             var pagedProducts = new PagedResult<Product>(products, rowsCount: 2, currentPage: 1, pageSize: 10);
 
-            _productRepositoryMock
-                .Setup(r => r.GetListPaginatedAsync(
+            _productUnitOfWorkMock
+                .Setup(r => r.Products.GetListPaginatedAsync(
                     It.IsAny<int>(),
                     It.IsAny<int>(),
                     It.IsAny<Expression<Func<Product, bool>>>(),
@@ -51,7 +51,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
                 ))
                 .ReturnsAsync(pagedProducts);
 
-            var handler = new GetPagedProductsListQueryHandler(_mapper, _productRepositoryMock.Object);
+            var handler = new GetPagedProductsListQueryHandler(_mapper, _productUnitOfWorkMock.Object);
 
             var query = new GetPagedProductsListQuery(1, 10);
 
@@ -71,8 +71,8 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
             var products = new List<Product>();
             var pagedProducts = new PagedResult<Product>(products, rowsCount: 0, currentPage: 1, pageSize: 10);
 
-            _productRepositoryMock
-                .Setup(r => r.GetListPaginatedAsync(
+            _productUnitOfWorkMock
+                .Setup(r => r.Products.GetListPaginatedAsync(
                     It.IsAny<int>(),
                     It.IsAny<int>(),
                     It.IsAny<Expression<Func<Product, bool>>>(),
@@ -83,7 +83,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
                 ))
                 .ReturnsAsync(pagedProducts);
 
-            var handler = new GetPagedProductsListQueryHandler(_mapper, _productRepositoryMock.Object);
+            var handler = new GetPagedProductsListQueryHandler(_mapper, _productUnitOfWorkMock.Object);
 
             var query = new GetPagedProductsListQuery(1, 10);
 

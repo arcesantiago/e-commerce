@@ -29,9 +29,9 @@ namespace ProductService.API.Controllers
         [HttpGet("{id}", Name = "GetProduct")]
         [ProducesResponseType(typeof(ProductVm), (int)HttpStatusCode.OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ProductVm>> GetProduct([FromRoute] int id)
+        public async Task<ActionResult<ProductVm>> GetProduct([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            return Ok(await _mediator.Send(new GetProductQuery(id)));
+            return Ok(await _mediator.Send(new GetProductQuery(id), cancellationToken));
         }
 
         /// <summary>
@@ -42,9 +42,9 @@ namespace ProductService.API.Controllers
         /// <returns>paged product list</returns>
         [HttpGet(Name = "GetPagedProductsList")]
         [ProducesResponseType(typeof(PagedResult<PagedProductsListVm>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<PagedResult<PagedProductsListVm>>> GetPagedProductsListQuery([FromQuery] int currentPage, [FromQuery] int pageSize)
+        public async Task<ActionResult<PagedResult<PagedProductsListVm>>> GetPagedProductsListQuery([FromQuery] int currentPage, [FromQuery] int pageSize, CancellationToken cancellationToken = default)
         {
-            return Ok(await _mediator.Send(new GetPagedProductsListQuery(currentPage, pageSize)));
+            return Ok(await _mediator.Send(new GetPagedProductsListQuery(currentPage, pageSize), cancellationToken));
         }
 
         /// <summary>
@@ -54,9 +54,9 @@ namespace ProductService.API.Controllers
         /// <returns></returns>
         [HttpPost(Name = "CreateProduct")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<int>> CreateProduct([FromBody] CreateProductCommandRequest request)
+        public async Task<ActionResult<int>> CreateProduct([FromBody] CreateProductCommandRequest request, CancellationToken cancellationToken = default)
         {
-            return Ok(await _mediator.Send(new CreateProductCommand(request)));
+            return Ok(await _mediator.Send(new CreateProductCommand(request), cancellationToken));
         }
 
         /// <summary>
@@ -68,9 +68,9 @@ namespace ProductService.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult> UpdateProduct([FromBody] UpdateProductCommandRequest request)
+        public async Task<ActionResult> UpdateProduct([FromBody] UpdateProductCommandRequest request, CancellationToken cancellationToken = default)
         {
-            await _mediator.Send(new UpdateProductCommand(request));
+            await _mediator.Send(new UpdateProductCommand(request), cancellationToken);
 
             return NoContent();
         }
@@ -84,9 +84,9 @@ namespace ProductService.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult> DeleteProduct([FromRoute] int id)
+        public async Task<ActionResult> DeleteProduct([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            await _mediator.Send(new DeleteProductCommand(id));
+            await _mediator.Send(new DeleteProductCommand(id), cancellationToken);
 
             return NoContent();
         }

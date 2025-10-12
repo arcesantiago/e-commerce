@@ -12,7 +12,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
     public class CreateProductCommandHandlerTests
     {
         private readonly IMapper _mapper;
-        private readonly Mock<IProductRepository> _productRepositoryMock;
+        private readonly Mock<IProductUnitOfWork> _productUnitOfWorkMock;
         private readonly Mock<ILogger<CreateProductCommandHandler>> _loggerMock;
 
         public CreateProductCommandHandlerTests()
@@ -24,7 +24,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
             NullLoggerFactory.Instance);
             _mapper = mapperConfig.CreateMapper();
 
-            _productRepositoryMock = new Mock<IProductRepository>();
+            _productUnitOfWorkMock = new Mock<IProductUnitOfWork>();
             _loggerMock = new Mock<ILogger<CreateProductCommandHandler>>();
         }
 
@@ -39,14 +39,14 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
                 Stock = 5
             });
 
-            _productRepositoryMock
-                .Setup(r => r.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
+            _productUnitOfWorkMock
+                .Setup(r => r.Products.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product p, CancellationToken _) => { p.Id = 1; return p; });
 
             var handler = new CreateProductCommandHandler(
                 _loggerMock.Object,
                 _mapper,
-                _productRepositoryMock.Object
+                _productUnitOfWorkMock.Object
             );
 
             // Act
@@ -54,7 +54,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
 
             // Assert
             Assert.Equal(1, result);
-            _productRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()), Times.Once);
+            _productUnitOfWorkMock.Verify(r => r.Products.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact(DisplayName = "Handle should throw when price is invalid")]

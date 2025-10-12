@@ -9,11 +9,11 @@ using System.ComponentModel.DataAnnotations;
 namespace OrderService.Application.Features.Orders.Commands.CreateOrder
 {
     public record CreateOrderCommand(CreateOrderCommandRequest CreateOrderCommandRequest) : IRequest<int>;
-    public class CreateOrderCommandHandler(ILogger<CreateOrderCommandHandler> logger, IMapper mapper, IOrderRepository repository, IProductServiceClient productServiceClient) : IRequestHandler<CreateOrderCommand, int>
+    public class CreateOrderCommandHandler(ILogger<CreateOrderCommandHandler> logger, IMapper mapper, IOrderUnitOfWork orderUnitOfWork, IProductServiceClient productServiceClient) : IRequestHandler<CreateOrderCommand, int>
     {
         private readonly IMapper _mapper = mapper;
         private readonly ILogger<CreateOrderCommandHandler> _logger = logger;
-        private readonly IOrderRepository _repository = repository;
+        private readonly IOrderUnitOfWork _orderUnitOfWork = orderUnitOfWork;
         private readonly IProductServiceClient _productServiceClient = productServiceClient;
 
         public async Task<int> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -32,12 +32,12 @@ namespace OrderService.Application.Features.Orders.Commands.CreateOrder
                     throw new ValidationException("Invalid price");
             }
 
-            await _repository.AddAsync(order);
+            await _orderUnitOfWork.Orders.AddAsync(order, cancellationToken);
+            await _orderUnitOfWork.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation($"The product {order.Id} was created successfully");
 
             return order.Id;
         }
     }
-
 }

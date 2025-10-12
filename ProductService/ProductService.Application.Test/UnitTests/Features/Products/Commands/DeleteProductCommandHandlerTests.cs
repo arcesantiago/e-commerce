@@ -5,18 +5,17 @@ using ProductService.Application.Contracts.Persistence;
 using ProductService.Application.Exceptions;
 using ProductService.Application.Features.Products.Commands.DeleteProduct;
 using ProductService.Domain;
-using System.Linq.Expressions;
 
 namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
 {
     public class DeleteProductCommandHandlerTests
     {
-        private readonly Mock<IProductRepository> _productRepositoryMock;
+        private readonly Mock<IProductUnitOfWork> _productUnitOfWorkMock;
         private readonly Mock<ILogger<DeleteProductCommandHandler>> _loggerMock;
 
         public DeleteProductCommandHandlerTests()
         {
-            _productRepositoryMock = new Mock<IProductRepository>();
+            _productUnitOfWorkMock = new Mock<IProductUnitOfWork>();
             _loggerMock = new Mock<ILogger<DeleteProductCommandHandler>>();
         }
 
@@ -25,17 +24,16 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
         {
             // Arrange
             var existingProduct = new Product { Id = 1, Description = "To Delete", Price = 10, Stock = 2 };
-            _productRepositoryMock
-                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _productUnitOfWorkMock
+                .Setup(r => r.Products.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(existingProduct);
 
-            _productRepositoryMock
-                .Setup(r => r.DeleteAsync(existingProduct, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
+            _productUnitOfWorkMock
+                .Setup(r => r.Products.Delete(existingProduct));
 
             var handler = new DeleteProductCommandHandler(
                 _loggerMock.Object,
-                _productRepositoryMock.Object
+                _productUnitOfWorkMock.Object
             );
 
             var command = new DeleteProductCommand(1);
@@ -45,20 +43,20 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
 
             // Assert
             Assert.Equal(Unit.Value, result);
-            _productRepositoryMock.Verify(r => r.DeleteAsync(existingProduct, It.IsAny<CancellationToken>()), Times.Once);
+            _productUnitOfWorkMock.Verify(r => r.Products.Delete(existingProduct), Times.Once);
         }
 
         [Fact(DisplayName = "Handle should throw NotFoundException when product does not exist")]
         public async Task Handle_ShouldThrow_WhenProductNotExists()
         {
             // Arrange
-            _productRepositoryMock
-                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _productUnitOfWorkMock
+                .Setup(r => r.Products.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product)null!);
 
             var handler = new DeleteProductCommandHandler(
                 _loggerMock.Object,
-                _productRepositoryMock.Object
+                _productUnitOfWorkMock.Object
             );
 
             var command = new DeleteProductCommand(999);
