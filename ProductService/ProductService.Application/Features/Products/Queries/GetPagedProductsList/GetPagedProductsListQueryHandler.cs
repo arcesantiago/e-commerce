@@ -1,11 +1,16 @@
 ﻿using AutoMapper;
 using MediatR;
+using ProductService.Application.Common.Interfaces;
 using ProductService.Application.Contracts.Persistence;
 using ProductService.Application.Models;
 
 namespace ProductService.Application.Features.Products.Queries.GetPagedProductsList
 {
-    public record GetPagedProductsListQuery(int CurrentPage, int PageSize) : IRequest<PagedResult<PagedProductsListVm>>;
+    public record GetPagedProductsListQuery(int CurrentPage, int PageSize) : IRequest<PagedResult<PagedProductsListVm>>, ICacheableQuery
+    {
+        public string CacheKey => nameof(GetPagedProductsListQuery);
+        public TimeSpan? Expiration => TimeSpan.FromMinutes(1);
+    }
 
     public class GetPagedProductsListQueryHandler(IMapper mapper, IProductUnitOfWork productUnitOfWork) : IRequestHandler<GetPagedProductsListQuery, PagedResult<PagedProductsListVm>>
     {
