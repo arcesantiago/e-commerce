@@ -10,8 +10,11 @@ jobs:
   build-test:
     name: Build & Test (Microservices)
     runs-on: ubuntu-latest
+    environment: staging
     permissions:
       packages: write
+    env:
+      DOTNET_ENVIRONMENT: Staging
     steps:
       - uses: actions/checkout@v3
 
@@ -40,12 +43,9 @@ jobs:
           echo "Levantando contenedor de PostgreSQL..."
           docker compose -f docker-compose.test.yml up -d --force-recreate postgres-test 
           
-          # 2. Sleep agresivo
           echo "Esperando 45 segundos para el inicio completo de la DB..."
           sleep 45
 
-          # 3. Esperar a que la base de datos esté lista usando docker exec
-          #    La espera es ahora sobre el localhost (el puerto mapeado 5432)
           COUNT=0
           until docker exec postgres-test-ci pg_isready -h localhost -U postgres -d order; do
             echo "PostgreSQL no está listo (intentando $COUNT)..."
