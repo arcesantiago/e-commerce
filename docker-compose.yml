@@ -41,7 +41,7 @@ services:
 
 networks:
   appnet:
-    driver: bridge
+    name: appnet
 
 volumes:
   postgres_data:
