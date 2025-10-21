@@ -48,13 +48,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
                 _productUnitOfWorkMock.Object
             );
 
-            var command = new UpdateProductCommand( new UpdateProductCommandRequest
-            {
-                Id = 1,
-                Description = "Updated Name",
-                Price = 15m,
-                Stock = 5
-            });
+            var command = new UpdateProductCommand(new UpdateProductCommandRequest(1, "Updated Name", 15m, 5));
 
             // Act
             var result = await handler.Handle(command, default);
@@ -81,13 +75,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
                 _productUnitOfWorkMock.Object
             );
 
-            var command = new UpdateProductCommand(new UpdateProductCommandRequest
-            {
-                Id = 999,
-                Description = "Does Not Exist",
-                Price = 15m,
-                Stock = 5
-            });
+            var command = new UpdateProductCommand(new UpdateProductCommandRequest(999, "Does Not Exist", 15m, 5));
 
             // Act & Assert
             await Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command, default));
@@ -97,13 +85,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
         public void Validator_ShouldFail_WhenDescriptionIsNull()
         {
             // Arrange
-            var command = new UpdateProductCommand(new UpdateProductCommandRequest
-            {
-                Id = 1,
-                Description = null!,
-                Price = 15m,
-                Stock = 5
-            });
+            var command = new UpdateProductCommand(new UpdateProductCommandRequest(1, null!, 15m, 5));
 
             var validator = new UpdateProductCommandValidator();
 
@@ -119,13 +101,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
         public void Validator_ShouldFail_WhenPriceInvalid()
         {
             // Arrange
-            var command = new UpdateProductCommand(new UpdateProductCommandRequest
-            {
-                Id = 1,
-                Description = "Valid Name",
-                Price = 0m,
-                Stock = 5
-            });
+            var command = new UpdateProductCommand(new UpdateProductCommandRequest(1, "Valid Name", 0m, 5));
 
             var validator = new UpdateProductCommandValidator();
 

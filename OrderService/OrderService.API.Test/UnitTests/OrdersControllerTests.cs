@@ -74,7 +74,8 @@ namespace OrderService.API.Test.UnitTests
         public async Task CreateOrder_ShouldReturnOk_WithOrderId()
         {
             // Arrange
-            var request = new CreateOrderCommandRequest();
+            var createOrderCommandItemRequest = new List<CreateOrderCommandItemRequest>() { new CreateOrderCommandItemRequest(1, 2, 50) };
+            var request = new CreateOrderCommandRequest("CUST-1", DateTime.UtcNow, createOrderCommandItemRequest);
             _mediatorMock
                 .Setup(m => m.Send(It.IsAny<CreateOrderCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(123);

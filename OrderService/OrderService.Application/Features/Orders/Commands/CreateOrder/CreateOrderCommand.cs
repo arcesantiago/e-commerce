@@ -40,4 +40,7 @@ namespace OrderService.Application.Features.Orders.Commands.CreateOrder
             return order.Id;
         }
     }
+
+    public record CreateOrderCommandRequest(string CustomerId, DateTimeOffset OrderDate, List<CreateOrderCommandItemRequest> Items);
+    public record CreateOrderCommandItemRequest(int ProductId, int Quantity, decimal UnitPrice);
 }

@@ -57,7 +57,7 @@ namespace ProductService.API.Test.IntegrationTests.Controllers
         [Fact(DisplayName = "POST /api/products creates product")]
         public async Task CreateProduct_ReturnsId()
         {
-            var cmd = new CreateProductCommandRequest { Description = "New Product", Price = 50m, Stock = 5 };
+            var cmd = new CreateProductCommandRequest("New Product", 50m, 5);
 
             var response = await _client.PostAsJsonAsync("/api/products", cmd);
 
@@ -71,7 +71,7 @@ namespace ProductService.API.Test.IntegrationTests.Controllers
         [Fact(DisplayName = "PUT /api/products updates existing product")]
         public async Task UpdateProduct_ReturnsNoContent_WhenExists()
         {
-            var cmd = new UpdateProductCommandRequest { Id = 2, Description = "Updated Name", Price = 15m, Stock = 5 };
+            var cmd = new UpdateProductCommandRequest(2, "Updated Name", 15m, 5);
             var response = await _client.PutAsJsonAsync("/api/products", cmd);
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -83,7 +83,7 @@ namespace ProductService.API.Test.IntegrationTests.Controllers
         [Fact(DisplayName = "PUT /api/products returns NotFound when not exists")]
         public async Task UpdateProduct_ReturnsNotFound_WhenNotExists()
         {
-            var cmd = new UpdateProductCommandRequest { Id = 999, Description = "Does Not Exist", Price = 15m, Stock = 1 };
+            var cmd = new UpdateProductCommandRequest(999, "Does Not Exist", 15m, 1);
             var response = await _client.PutAsJsonAsync("/api/products", cmd);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);

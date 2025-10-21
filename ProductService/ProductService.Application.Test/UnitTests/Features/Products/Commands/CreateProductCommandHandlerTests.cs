@@ -32,12 +32,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
         public async Task Handle_ShouldCreateProduct_AndReturnId()
         {
             // Arrange
-            var command = new CreateProductCommand(new CreateProductCommandRequest
-            {
-                Description = "Test Product",
-                Price = 100m,
-                Stock = 5
-            });
+            var command = new CreateProductCommand(new CreateProductCommandRequest("Test Product", 100m, 5));
 
             _productUnitOfWorkMock
                 .Setup(r => r.Products.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
@@ -61,12 +56,8 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Commands
         public void Handle_ShouldThrow_WhenPriceInvalid()
         {
             // Arrange
-            var command = new CreateProductCommand(new CreateProductCommandRequest
-            {
-                Description = "Invalid",
-                Price = 0m,
-                Stock = 5
-            });
+            var command = new CreateProductCommand(new CreateProductCommandRequest("Invalid", 0m, 5));
+
 
             var validator = new CreateProductCommandValidator();
 

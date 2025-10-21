@@ -59,12 +59,7 @@ namespace ProductService.API.Test.UnitTests.Controllers
             _mediatorMock.Setup(m => m.Send(It.IsAny<CreateProductCommand>(), default))
                 .ReturnsAsync(99);
 
-            var result = await _controller.CreateProduct(new CreateProductCommandRequest
-            {
-                Description = "Test",
-                Price = 1m,
-                Stock = 1
-            });
+            var result = await _controller.CreateProduct(new CreateProductCommandRequest("Test", 1m, 1));
 
             var ok = Assert.IsType<OkObjectResult>(result.Result);
             Assert.Equal(99, ok.Value);
@@ -76,13 +71,7 @@ namespace ProductService.API.Test.UnitTests.Controllers
             _mediatorMock.Setup(m => m.Send(It.IsAny<UpdateProductCommand>(), default))
                 .ReturnsAsync(Unit.Value);
 
-            var result = await _controller.UpdateProduct(new UpdateProductCommandRequest
-            {
-                Id = 1,
-                Description = "Test",
-                Price = 2m,
-                Stock = 2
-            });
+            var result = await _controller.UpdateProduct(new UpdateProductCommandRequest(1, "Test", 2m, 2));
 
             Assert.IsType<NoContentResult>(result);
         }

@@ -25,4 +25,5 @@ namespace ProductService.Application.Features.Products.Commands.CreateProduct
             return productToAdd.Id;
         }
     }
+    public record CreateProductCommandRequest(string Description, decimal Price, int Stock);
 }

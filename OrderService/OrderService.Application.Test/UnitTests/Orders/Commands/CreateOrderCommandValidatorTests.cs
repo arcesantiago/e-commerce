@@ -8,15 +8,8 @@ public class CreateOrderCommandValidatorTests
     [Fact]
     public void Should_Pass_When_RequestIsValid()
     {
-        var request = new CreateOrderCommandRequest
-        {
-            CustomerId = "CUST-1",
-            OrderDate = DateTime.UtcNow,
-            Items = new List<CreateOrderCommandItemRequest>
-            {
-                new() { ProductId = 1, Quantity = 2, UnitPrice = 50 }
-            }
-        };
+        var createOrderCommandItemRequest = new List<CreateOrderCommandItemRequest>() { new CreateOrderCommandItemRequest(1, 2, 50) };
+        var request = new CreateOrderCommandRequest("CUST-1", DateTime.UtcNow, createOrderCommandItemRequest);
 
         var result = _validator.Validate(new CreateOrderCommand(request));
 
@@ -26,14 +19,8 @@ public class CreateOrderCommandValidatorTests
     [Fact]
     public void Should_Fail_When_CustomerIdIsEmpty()
     {
-        var request = new CreateOrderCommandRequest
-        {
-            CustomerId = "",
-            Items = new List<CreateOrderCommandItemRequest>
-            {
-                new() { ProductId = 1, Quantity = 2, UnitPrice = 50 }
-            }
-        };
+        var createOrderCommandItemRequest = new List<CreateOrderCommandItemRequest>() { new CreateOrderCommandItemRequest(1, 2, 50) };
+        var request = new CreateOrderCommandRequest(string.Empty, DateTime.UtcNow, createOrderCommandItemRequest);
 
         var result = _validator.Validate(new CreateOrderCommand(request));
 

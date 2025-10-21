@@ -60,14 +60,8 @@ namespace OrderService.API.Test.IntegrationTests
         [Fact]
         public async Task CreateOrder_ShouldReturnOk_WithNewId()
         {
-            var request = new CreateOrderCommandRequest
-            {
-                CustomerId = "CUST-2",
-                Items = new List<CreateOrderCommandItemRequest>
-                {
-                    new CreateOrderCommandItemRequest { ProductId = 1, Quantity = 1, UnitPrice = 50 }
-                }
-            };
+            var createOrderCommandItemRequest = new List<CreateOrderCommandItemRequest>() { new CreateOrderCommandItemRequest(1, 2, 50) };
+            var request = new CreateOrderCommandRequest("CUST-2", DateTime.UtcNow, createOrderCommandItemRequest);
 
             var response = await _client.PostAsJsonAsync("/api/orders", request);
 

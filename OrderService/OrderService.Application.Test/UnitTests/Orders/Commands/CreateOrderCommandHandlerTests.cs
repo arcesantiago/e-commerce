@@ -37,15 +37,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
         public async Task Handle_ShouldCreateOrder_WhenProductsAreValid()
         {
             // Arrange
-            var request = new CreateOrderCommandRequest
-            {
-                CustomerId = "CUST-1",
-                OrderDate = DateTime.UtcNow,
-                Items = new List<CreateOrderCommandItemRequest>
-                {
-                    new CreateOrderCommandItemRequest { ProductId = 1, Quantity = 2, UnitPrice = 50 }
-                }
-            };
+            var createOrderCommandItemRequest = new List<CreateOrderCommandItemRequest>() { new CreateOrderCommandItemRequest(1, 2, 50) };
+            var request = new CreateOrderCommandRequest("CUST-1", DateTime.UtcNow, createOrderCommandItemRequest);
 
             var order = new Order
             {
@@ -84,15 +77,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
         public async Task Handle_ShouldThrowValidationException_WhenProductOutOfStock()
         {
             // Arrange
-            var request = new CreateOrderCommandRequest
-            {
-                CustomerId = "CUST-1",
-                OrderDate = DateTime.UtcNow,
-                Items = new List<CreateOrderCommandItemRequest>
-                {
-                    new CreateOrderCommandItemRequest { ProductId = 1, Quantity = 1, UnitPrice = 50 }
-                }
-            };
+            var createOrderCommandItemRequest = new List<CreateOrderCommandItemRequest>() { new CreateOrderCommandItemRequest(1, 2, 50) };
+            var request = new CreateOrderCommandRequest("CUST-1", DateTime.UtcNow, createOrderCommandItemRequest);
 
             var order = new Order
             {
@@ -123,15 +109,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Commands
         public async Task Handle_ShouldThrowValidationException_WhenProductPriceInvalid()
         {
             // Arrange
-            var request = new CreateOrderCommandRequest
-            {
-                CustomerId = "CUST-1",
-                OrderDate = DateTime.UtcNow,
-                Items = new List<CreateOrderCommandItemRequest>
-                {
-                    new CreateOrderCommandItemRequest { ProductId = 1, Quantity = 1, UnitPrice = 50 }
-                }
-            };
+            var createOrderCommandItemRequest = new List<CreateOrderCommandItemRequest>() { new CreateOrderCommandItemRequest(1, 2, 50) };
+            var request = new CreateOrderCommandRequest("CUST-1", DateTime.UtcNow, createOrderCommandItemRequest);
 
             var order = new Order
             {

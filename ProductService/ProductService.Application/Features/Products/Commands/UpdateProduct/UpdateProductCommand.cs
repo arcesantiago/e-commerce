@@ -33,4 +33,6 @@ namespace ProductService.Application.Features.Products.Commands.UpdateProduct
             return Unit.Value;
         }
     }
+    public record UpdateProductCommandRequest(int Id, string Description, decimal Price, int Stock);
+
 }
