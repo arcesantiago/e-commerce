@@ -1,6 +1,5 @@
 services:
   productservice.api:
-    image: tst-productserviceapi:latest
     build:
       context: .
       dockerfile: ProductService/ProductService.API/Dockerfile
@@ -14,7 +13,6 @@ services:
       - ./ProductService/ProductService.API:/src/ProductService.API 
 
   orderservice.api:
-    image: tst-orderservice:latest
     build:
       context: .
       dockerfile: OrderService/OrderService.API/Dockerfile
@@ -26,21 +24,3 @@ services:
       - "8081:8080"
     volumes:
       - ./OrderService/OrderService.API:/src/OrderService.API
-
-  redis:
-    image: redis:latest
-    container_name: redis-local
-    ports:
-        - "6379:6379"
-    networks:
-        - appnet
-    healthcheck:
-        test: ["CMD", "redis-cli", "ping"]
-        interval: 10s
-        timeout: 3s
-        retries: 3
-        start_period: 15s
-    deploy:
-      resources:
-        limits:
-          memory: 256M
