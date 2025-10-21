@@ -15,6 +15,7 @@ jobs:
       packages: write
     env:
       DOTNET_ENVIRONMENT: Staging
+      ASPNETCORE_ENVIRONMENT: Staging
     steps:
       - uses: actions/checkout@v3
 
@@ -23,9 +24,9 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Configurar Entorno de Pruebas (Solución Final con Sleep y Exec)
+      - name: Configurar Entorno de Pruebas
         run: |
-          # 1. Crear el docker-compose.test.yml (Eliminamos el healthcheck)
+          # 1. Crear el docker-compose.test.yml
           cat <<EOF > docker-compose.test.yml
           version: '3.8'
           services:
@@ -53,7 +54,7 @@ jobs:
             COUNT=$((COUNT + 1))
             if [ $COUNT -gt 6 ]; then # Fallar después de 30 segundos más
               echo "FALLO: Timeout al esperar la base de datos."
-              # Muestra logs si falla
+
               docker compose -f docker-compose.test.yml logs postgres-test
               exit 1
             fi
@@ -61,25 +62,22 @@ jobs:
           echo "PostgreSQL está listo."
 
       - name: Crear Base de Datos 'product'
-        # Usamos el nombre explícito del contenedor que definimos en el compose file
         run: |
           docker exec postgres-test-ci psql -U postgres -d order -c "CREATE DATABASE product;" 
         env:
           PGPASSWORD: Romari0!
 
-      - name: Ejecutar Tests para ProductService (Integración)
+      - name: Ejecutar Tests para ProductService
         run: |
           dotnet test ProductService/ProductService.sln --configuration Release --verbosity normal
 
-      - name: Ejecutar Tests para OrderService (Integración)
+      - name: Ejecutar Tests para OrderService
         run: |
           dotnet test OrderService/OrderService.sln --configuration Release --verbosity normal
           
       - name: Limpiar Contenedor de Pruebas
         if: always()
         run: docker compose -f docker-compose.test.yml down -v
-
-      # --- El resto del flujo de Build/Deploy permanece igual ---
 
       - name: Configurar variables de tag
         id: vars
