@@ -11,13 +11,11 @@ namespace OrderService.Infrastructure.Test.IntegrationTests.Utils
 
             var apiProjectPath = Path.Combine(projectDir, "OrderService.API");
 
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             return new ConfigurationBuilder()
                 .SetBasePath(apiProjectPath)
                 .AddJsonFile("appsettings.json", optional: true)
-                .AddJsonFile($"appsettings.Development.json", optional: true)
-                .AddJsonFile($"appsettings.Testing.json", optional: true)
-                .AddJsonFile($"appsettings.Staging.json", optional: true)
-                .AddJsonFile($"appsettings.Production.json", optional: true)
+                .AddJsonFile($"appsettings.{environment ?? "Development": environment}.json", optional: true)
                 .AddEnvironmentVariables()
                 .Build();
         }
