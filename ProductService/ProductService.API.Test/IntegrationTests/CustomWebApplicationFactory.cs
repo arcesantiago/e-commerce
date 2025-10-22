@@ -14,41 +14,6 @@ namespace ProductService.API.Test.IntegrationTests
         {
             builder.ConfigureTestServices(services =>
             {
-                var sp = services.BuildServiceProvider();
-                using var scope = sp.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
-
-                db.ChangeTracker.Clear();
-                db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Products\" RESTART IDENTITY CASCADE;");
-
-                db.Products!.AddRangeAsync(new Product
-                {
-                    Description = "P1",
-                    Price = 99.99m
-                },
-                new Product
-                {
-                    Description = "P2",
-                    Price = 33
-                },
-                new Product
-                {
-                    Description = "P3",
-                    Price = 33
-                },
-                new Product
-                {
-                    Description = "P4",
-                    Price = 33
-                },
-                new Product
-                {
-                    Description = "P5",
-                    Price = 33
-                }
-                );
-
-                db.SaveChangesAsync();
             });
         }
     }

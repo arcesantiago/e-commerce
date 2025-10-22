@@ -23,14 +23,14 @@ namespace ProductService.API.Test.IntegrationTests.Controllers
         [Fact(DisplayName = "GET /api/products/{id} returns product when exists")]
         public async Task GetProduct_ReturnsOk_WhenExists()
         {
-            var response = await _client.GetAsync("/api/products/3");
+            var response = await _client.GetAsync("/api/products/1");
 
             response.EnsureSuccessStatusCode();
             var product = await response.Content.ReadFromJsonAsync<ProductVm>();
 
             Assert.NotNull(product);
-            Assert.Equal(3, product!.Id);
-            Assert.Equal("P3", product.Description);
+            Assert.Equal(1, product!.Id);
+            Assert.Equal("Updated Name", product.Description);
         }
 
         [Fact(DisplayName = "GET /api/products/{id} returns NotFound when not exists")]

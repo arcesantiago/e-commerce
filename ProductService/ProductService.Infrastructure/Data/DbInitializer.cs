@@ -50,6 +50,14 @@ namespace ProductService.Infrastructure.Data
                         Stock = 50,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
+                    },
+                    new Product
+                    {
+                        Description = "P6",
+                        Price = 199.99m,
+                        Stock = 50,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
                     }
                 };
 
