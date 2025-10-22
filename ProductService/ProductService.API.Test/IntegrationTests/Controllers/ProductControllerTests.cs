@@ -23,14 +23,14 @@ namespace ProductService.API.Test.IntegrationTests.Controllers
         [Fact(DisplayName = "GET /api/products/{id} returns product when exists")]
         public async Task GetProduct_ReturnsOk_WhenExists()
         {
-            var response = await _client.GetAsync("/api/products/4");
+            var response = await _client.GetAsync("/api/products/3");
 
             response.EnsureSuccessStatusCode();
             var product = await response.Content.ReadFromJsonAsync<ProductVm>();
 
             Assert.NotNull(product);
-            Assert.Equal(4, product!.Id);
-            Assert.Equal("P4", product.Description);
+            Assert.Equal(3, product!.Id);
+            Assert.Equal("P3", product.Description);
         }
 
         [Fact(DisplayName = "GET /api/products/{id} returns NotFound when not exists")]
@@ -71,12 +71,12 @@ namespace ProductService.API.Test.IntegrationTests.Controllers
         [Fact(DisplayName = "PUT /api/products updates existing product")]
         public async Task UpdateProduct_ReturnsNoContent_WhenExists()
         {
-            var cmd = new UpdateProductCommandRequest(2, "Updated Name", 15m, 5);
+            var cmd = new UpdateProductCommandRequest(1, "Updated Name", 15m, 5);
             var response = await _client.PutAsJsonAsync("/api/products", cmd);
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-            var updated = await _client.GetFromJsonAsync<ProductVm>("/api/products/2");
+            var updated = await _client.GetFromJsonAsync<ProductVm>("/api/products/1");
             Assert.Equal("Updated Name", updated!.Description);
         }
 
@@ -93,10 +93,10 @@ namespace ProductService.API.Test.IntegrationTests.Controllers
         [Fact(DisplayName = "DELETE /api/products/{id} deletes existing product")]
         public async Task DeleteProduct_ReturnsNoContent_WhenExists()
         {
-            var response = await _client.DeleteAsync("/api/products/5");
+            var response = await _client.DeleteAsync("/api/products/2");
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-            var getResponse = await _client.GetAsync("/api/products/5");
+            var getResponse = await _client.GetAsync("/api/products/2");
             Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
         }
 

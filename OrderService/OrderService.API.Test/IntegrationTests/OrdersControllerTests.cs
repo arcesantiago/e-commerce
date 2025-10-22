@@ -20,13 +20,13 @@ namespace OrderService.API.Test.IntegrationTests
         [Fact]
         public async Task GetOrder_ShouldReturnOk_WhenExists()
         {
-            var response = await _client.GetAsync("/api/orders/3");
+            var response = await _client.GetAsync("/api/orders/1");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var order = await response.Content.ReadFromJsonAsync<OrderVm>();
             Assert.NotNull(order);
-            Assert.Equal(3, order.Id);
+            Assert.Equal(1, order.Id);
         }
 
         [Fact]

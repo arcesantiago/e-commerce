@@ -17,13 +17,6 @@ namespace OrderService.API.IntegrationTests
         {
             builder.ConfigureTestServices(services =>
             {
-                services.RemoveAll(typeof(IDbContextOptionsConfiguration<OrderDbContext>));
-
-                services.AddDbContext<OrderDbContext>(options =>
-                {
-                    options.UseInMemoryDatabase($"OrderDbContext");
-                });
-
                 var productClientDescriptor = services.SingleOrDefault(
                     d => d.ServiceType == typeof(IProductServiceClient));
                 if (productClientDescriptor != null)
@@ -31,12 +24,12 @@ namespace OrderService.API.IntegrationTests
 
                 services.AddSingleton<IProductServiceClient, FakeProductServiceClient>();
 
-                var sp = services.BuildServiceProvider();
-                using var scope = sp.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
+                //var sp = services.BuildServiceProvider();
+                //using var scope = sp.CreateScope();
+                //var db = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
 
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
+                //db.Database.EnsureDeleted();
+                //db.Database.EnsureCreated();
             });
         }
     }
