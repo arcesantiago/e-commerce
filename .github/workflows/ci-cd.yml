@@ -10,7 +10,7 @@ jobs:
   build-test:
     name: Build & Test (Microservices)
     runs-on: ubuntu-latest
-    environment: staging
+    environment: testing
     permissions:
       packages: write
     env:
