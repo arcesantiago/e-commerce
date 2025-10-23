@@ -72,6 +72,9 @@ jobs:
           done
           echo "PostgreSQL está listo."
 
+      - name: Verificar Redis responde
+        run: docker exec redis-test-ci redis-cli ping
+
       - name: Ejecutar Tests para ProductService
         run: |
           dotnet test ProductService/ProductService.sln --configuration Release --verbosity normal
