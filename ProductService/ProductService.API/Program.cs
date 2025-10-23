@@ -36,7 +36,10 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
 
     if (!builder.Environment.IsDevelopment())
+    {
+        await db.Database.EnsureDeletedAsync();
         await db.Database.MigrateAsync();
+    }
 
     DbInitializer.Seed(db);
 }
