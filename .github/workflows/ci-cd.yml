@@ -39,6 +39,17 @@ jobs:
                 POSTGRES_DB: order
               ports:
                 - "5432:5432"
+            redis-test:
+              image: redis:7-alpine
+              container_name: redis-test-ci
+              ports:
+                - "6379:6379"
+              healthcheck:
+                test: ["CMD", "redis-cli", "ping"]
+                interval: 10s
+                timeout: 3s
+                retries: 3
+                start_period: 5s
           EOF
           
           echo "Levantando contenedor de PostgreSQL..."
