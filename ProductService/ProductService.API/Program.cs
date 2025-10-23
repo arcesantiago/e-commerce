@@ -35,7 +35,16 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
 
-    if(!builder.Environment.IsDevelopment())
+    if (db.Database.CanConnect())
+    {
+        Console.WriteLine("La conexión a la base de datos es exitosa.");
+    }
+    else
+    {
+        Console.WriteLine("No se pudo conectar a la base de datos.");
+    }
+
+    if (!builder.Environment.IsDevelopment())
         await db.Database.MigrateAsync();
 
     DbInitializer.Seed(db);
