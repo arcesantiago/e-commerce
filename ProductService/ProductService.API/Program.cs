@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using ProductService.API;
 using ProductService.API.Middleware;
 using ProductService.Application;
@@ -35,11 +36,13 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
 
-    if (!builder.Environment.IsDevelopment())
+    if (builder.Environment.IsDevelopment() || builder.Environment.EnvironmentName == "Testing")
     {
         await db.Database.EnsureDeletedAsync();
-        await db.Database.MigrateAsync();
+        await db.Database.EnsureCreatedAsync();
     }
+    else 
+        await db.Database.MigrateAsync();
 
     DbInitializer.Seed(db);
 }

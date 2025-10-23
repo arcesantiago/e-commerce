@@ -35,7 +35,12 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
 
-    if (!builder.Environment.IsDevelopment())
+    if (builder.Environment.IsDevelopment() || builder.Environment.EnvironmentName == "Testing")
+    {
+        await db.Database.EnsureDeletedAsync();
+        await db.Database.EnsureCreatedAsync();
+    }
+    else
         await db.Database.MigrateAsync();
 
     DbInitializer.Seed(db);

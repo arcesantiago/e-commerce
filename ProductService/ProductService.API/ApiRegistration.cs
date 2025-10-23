@@ -26,7 +26,7 @@ namespace ProductService.API
             {
                 options.AddPolicy("DefaultCors", policy =>
                 {
-                    if (hostEnvironment.IsDevelopment())
+                    if (hostEnvironment.IsDevelopment() || hostEnvironment.EnvironmentName == "Testing")
                     {
                         policy.AllowAnyOrigin()
                               .AllowAnyHeader()
