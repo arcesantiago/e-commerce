@@ -61,12 +61,6 @@ jobs:
           done
           echo "PostgreSQL está listo."
 
-      - name: Crear Base de Datos 'product'
-        run: |
-          docker exec postgres-test-ci psql -U postgres -d order -c "CREATE DATABASE product;" 
-        env:
-          PGPASSWORD: Romari0!
-
       - name: Ejecutar Tests para ProductService
         run: |
           dotnet test ProductService/ProductService.sln --configuration Release --verbosity normal
