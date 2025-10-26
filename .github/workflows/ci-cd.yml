@@ -24,79 +24,18 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Configurar Entorno de Pruebas
-        run: |
-          # 1. Crear el docker-compose.test.yml
-          cat <<EOF > docker-compose.test.yml
-          version: '3.8'
-          services:
-            postgres-test:
-              image: postgres:15-alpine
-              container_name: postgres-test-ci # 🔑 Nombre simple para la CLI
-              environment:
-                POSTGRES_USER: postgres
-                POSTGRES_PASSWORD: Romari0!
-                POSTGRES_DB: postgresdb
-              ports:
-                - "5432:5432"
-            redis-test:
-              image: redis:7-alpine
-              container_name: redis-test-ci
-              ports:
-                - "6379:6379"
-              healthcheck:
-                test: ["CMD", "redis-cli", "ping"]
-                interval: 10s
-                timeout: 3s
-                retries: 3
-                start_period: 5s
-          EOF
-          
-          echo "Levantando contenedor de PostgreSQL y Redis..."
-          docker compose -f docker-compose.test.yml up -d --force-recreate postgres-test redis-test
-          
-          echo "Esperando 45 segundos para el inicio completo de la DB..."
-          sleep 45
+      - name: Run API tests
+        run: docker compose -f docker-compose.testing.yml up --build --abort-on-container-exit --exit-code-from productservice-api-tests
+      
+      - name: Run Application tests
+        run: docker compose -f docker-compose.testing.yml up --build --abort-on-container-exit --exit-code-from productservice-application-tests
+      
+      - name: Run Infrastructure tests
+        run: docker compose -f docker-compose.testing.yml up --build --abort-on-container-exit --exit-code-from productservice-infrastructure-tests
 
-          COUNT=0
-          until docker exec postgres-test-ci pg_isready -h localhost -U postgres -d postgresdb; do
-            echo "PostgreSQL no está listo (intentando $COUNT)..."
-            sleep 5
-            COUNT=$((COUNT + 1))
-            if [ $COUNT -gt 6 ]; then # Fallar después de 30 segundos más
-              echo "FALLO: Timeout al esperar la base de datos."
-
-              docker compose -f docker-compose.test.yml logs postgres-test
-              exit 1
-            fi
-          done
-          echo "PostgreSQL está listo."
-
-          COUNT=0
-          until [ "$(docker inspect -f {{.State.Health.Status}} redis-test-ci)" == "healthy" ]; do
-            echo "Redis no está listo (intento $COUNT)..."
-            sleep 5
-            COUNT=$((COUNT + 1))
-            if [ $COUNT -gt 6 ]; then
-              echo "FALLO: Timeout esperando Redis"
-              docker compose -f docker-compose.test.yml logs redis-test
-              exit 1
-            fi
-          done
-          echo "Redis está listo."
-
-
-      - name: Ejecutar Tests para ProductService
-        run: |
-          dotnet test ProductService/ProductService.sln --configuration Release --verbosity normal
-
-      - name: Ejecutar Tests para OrderService
-        run: |
-          dotnet test OrderService/OrderService.sln --configuration Release --verbosity normal
-          
-      - name: Limpiar Contenedor de Pruebas
+      - name: Cleanup
         if: always()
-        run: docker compose -f docker-compose.test.yml down -v
+        run: docker compose -f docker-compose.testing.yml down -v
 
       - name: Configurar variables de tag
         id: vars
