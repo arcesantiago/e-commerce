@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ProductService.Application.Test": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

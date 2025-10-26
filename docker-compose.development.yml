@@ -1,6 +1,8 @@
 services:
   productservice.api:
-    image: dev-productserviceapi:latest 
+    build:
+      context: .
+      dockerfile: ProductService/ProductService.API/Dockerfile
     env_file:
       - ProductService/.env 
     environment:
@@ -11,7 +13,9 @@ services:
       - ./ProductService/ProductService.API:/src/ProductService.API 
 
   orderservice.api:
-    image: dev-orderservice:latest 
+    build:
+      context: .
+      dockerfile: OrderService/OrderService.API/Dockerfile
     env_file:
       - OrderService/.env
     environment:

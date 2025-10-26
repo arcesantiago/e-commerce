@@ -39,7 +39,7 @@ namespace ProductService.API.Test.UnitTests.Controllers
         public async Task GetPagedProductsList_ReturnsOk()
         {
             var paged = new PagedResult<PagedProductsListVm>(
-                new List<PagedProductsListVm> { new() { Id = 1, Description = "Test" } },
+                [new() { Id = 1, Description = "Test" }],
                 1, 1, 10
             );
 

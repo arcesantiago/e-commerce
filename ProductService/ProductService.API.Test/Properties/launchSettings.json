@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ProductService.API.Test": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

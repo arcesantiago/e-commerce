@@ -1,26 +1,65 @@
 services:
-  productservice.api:
-    build:
-      context: .
-      dockerfile: ProductService/ProductService.API/Dockerfile
-    env_file:
-      - ProductService/.env 
+  db:
+    image: postgres:16-alpine
+    container_name: postgres-test-ci
     environment:
-      - ASPNETCORE_ENVIRONMENT=Testing
-    ports:
-      - "8082:8080"
-    volumes:
-      - ./ProductService/ProductService.API:/src/ProductService.API 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Romari0!
+      POSTGRES_DB: product
+    networks:
+      - appnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d product"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
-  orderservice.api:
+  redis:
+    image: redis:7-alpine
+    container_name: redis-test-ci
+    networks:
+      - appnet
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  productservice-api-tests:
     build:
       context: .
-      dockerfile: OrderService/OrderService.API/Dockerfile
-    env_file:
-      - OrderService/.env
+      dockerfile: ProductService/ProductService.API.Test/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - ASPNETCORE_ENVIRONMENT=Testing
-    ports:
-      - "8081:8080"
-    volumes:
-      - ./OrderService/OrderService.API:/src/OrderService.API
+      ASPNETCORE_ENVIRONMENT: Testing
+    networks:
+      - appnet
+  productservice-application-tests:
+    build:
+        context: .
+        dockerfile: ProductService/ProductService.Application.Test/Dockerfile
+    environment:
+        ASPNETCORE_ENVIRONMENT: Testing
+    networks:
+          - appnet
+  productservice-infrastructure-tests:
+    build:
+        context: .
+        dockerfile: ProductService/ProductService.Infrastructure.Test/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+        ASPNETCORE_ENVIRONMENT: Testing
+    networks:
+          - appnet
+
+networks:
+  appnet:
+    driver: bridge
