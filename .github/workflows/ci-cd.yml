@@ -24,18 +24,10 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Run API tests
-        run: docker compose -f docker-compose.testing.yml up --build --abort-on-container-exit --exit-code-from productservice-api-tests
-      
-      - name: Run Application tests
-        run: docker compose -f docker-compose.testing.yml up --build --abort-on-container-exit --exit-code-from productservice-application-tests
-      
-      - name: Run Infrastructure tests
-        run: docker compose -f docker-compose.testing.yml up --build --abort-on-container-exit --exit-code-from productservice-infrastructure-tests
-
-      - name: Cleanup
-        if: always()
-        run: docker compose -f docker-compose.testing.yml down -v
+      - name: Ejecutar script de PowerShell
+        shell: pwsh
+        run: |
+          ./github/scripts/run-all-tests.ps1
 
       - name: Configurar variables de tag
         id: vars
