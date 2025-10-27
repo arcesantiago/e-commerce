@@ -59,6 +59,38 @@ services:
         ASPNETCORE_ENVIRONMENT: Testing
     networks:
           - appnet
+  orderservice-api-tests:
+    build:
+      context: .
+      dockerfile: OrderService/OrderService.API.Test/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Testing
+    networks:
+      - appnet
+  orderservice-application-tests:
+    build:
+        context: .
+        dockerfile: OrderService/OrderService.Application.Test/Dockerfile
+    environment:
+        ASPNETCORE_ENVIRONMENT: Testing
+    networks:
+          - appnet
+  orderservice-infrastructure-tests:
+    build:
+        context: .
+        dockerfile: OrderService/OrderService.Infrastructure.Test/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+        ASPNETCORE_ENVIRONMENT: Testing
+    networks:
+          - appnet
 
 networks:
   appnet:

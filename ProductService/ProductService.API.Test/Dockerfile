@@ -15,4 +15,4 @@ COPY ProductService/ ProductService/
 WORKDIR /src/ProductService/ProductService.API.Test
 RUN dotnet build ProductService.API.Test.csproj -c Release --no-restore
 
-CMD ["dotnet", "test", "ProductService.API.Test.csproj", "-c", "Release", "--no-build", "--verbosity", "normal"]
+CMD ["dotnet", "test", "ProductService.API.Test.csproj", "-c", "Release", "--no-build", "--logger:console;verbosity=normal"]

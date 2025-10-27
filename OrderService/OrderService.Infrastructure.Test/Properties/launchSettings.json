@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "OrderService.Infrastructure.Test": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

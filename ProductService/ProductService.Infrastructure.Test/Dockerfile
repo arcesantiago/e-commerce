@@ -13,4 +13,4 @@ COPY ProductService/ ProductService/
 WORKDIR /src/ProductService/ProductService.Infrastructure.Test
 RUN dotnet build ProductService.Infrastructure.Test.csproj -c Release --no-restore
 
-CMD ["dotnet", "test", "ProductService.Infrastructure.Test.csproj", "-c", "Release", "--no-build", "--verbosity", "normal"]
+CMD ["dotnet", "test", "ProductService.Infrastructure.Test.csproj", "-c", "Release", "--no-build", "--logger:console;verbosity=normal"]
