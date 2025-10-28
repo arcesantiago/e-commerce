@@ -1,32 +1,4 @@
 services:
-  db:
-    image: postgres:16-alpine
-    container_name: postgres-test-ci
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Romari0!
-      POSTGRES_DB: product
-    networks:
-      - appnet
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d product"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-  redis:
-    image: redis:7-alpine
-    container_name: redis-test-ci
-    networks:
-      - appnet
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
   productservice-api-tests:
     build:
       context: .
@@ -91,7 +63,3 @@ services:
         ASPNETCORE_ENVIRONMENT: Testing
     networks:
           - appnet
-
-networks:
-  appnet:
-    driver: bridge

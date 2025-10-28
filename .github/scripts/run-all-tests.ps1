@@ -1,5 +1,5 @@
-﻿$composeFile = "docker-compose.testing.yml"
-$services = @(
+﻿$composeFiles = @("-f", "docker-compose.yml", "-f", "docker-compose.testing.yml")
+$testServices = @(
   "productservice-api-tests",
   "productservice-application-tests",
   "productservice-infrastructure-tests",
@@ -8,15 +8,17 @@ $services = @(
   "orderservice-infrastructure-tests"
 )
 
-# Levantar dependencias
-docker compose -f $composeFile up -d db redis
+docker compose @composeFiles --profile infra down -v --remove-orphans
+
+docker compose @composeFiles --profile infra build $testServices
 
 $results = @{}
 
-foreach ($svc in $services) {
+foreach ($svc in $testServices) {
     Write-Host "▶️ Ejecutando $svc..."
     $logFile = "logs_$svc.txt"
-    docker compose -f $composeFile run --rm $svc *> $logFile
+
+    & docker compose @composeFiles --profile infra run --rm $svc 1> $logFile 2>&1
     $exitCode = $LASTEXITCODE
     $results[$svc] = $exitCode
 
@@ -27,7 +29,8 @@ foreach ($svc in $services) {
     Write-Host "==============================================="
 }
 
-docker compose -f $composeFile down -v
+docker compose @composeFiles --profile infra down -v --rmi all --remove-orphans
+docker system prune -af --volumes
 
 Write-Host ""
 Write-Host "===== 🏁 Resumen Final ====="
@@ -40,5 +43,4 @@ foreach ($svc in $results.Keys) {
 }
 Write-Host "============================"
 
-# Salir con error si alguno falló
 if ($results.Values -contains 1) { exit 1 } else { exit 0 }

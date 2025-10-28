@@ -1,5 +1,6 @@
 services:
   productservice.api:
+    profiles: ["app"]
     image: ${PRODUCT_IMAGE_TAG-}
     container_name: productservice.api
     depends_on:
@@ -11,6 +12,7 @@ services:
       - appnet
 
   orderservice.api:
+    profiles: ["app"]
     image: ${ORDER_IMAGE_TAG-}
     container_name: orderservice.api
     depends_on:
@@ -38,6 +40,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    profiles: ["infra","db"]
 
   redis:
     image: redis:latest
@@ -52,6 +55,7 @@ services:
         timeout: 3s
         retries: 3
         start_period: 15s
+    profiles: ["infra","redis"]
     deploy:
       resources:
         limits:
