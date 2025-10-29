@@ -88,4 +88,5 @@ jobs:
             export PRODUCT_IMAGE_TAG=$PRODUCT_IMAGE_URL
             export ORDER_IMAGE_TAG=$ORDER_IMAGE_URL
 
-            docker-compose -f docker-compose.yml -f docker-compose.staging.yml up -d --force-recreate
+            docker compose -f docker-compose.yml -f docker-compose.staging.yml \
+              --profile app --profile infra up -d --force-recreate
