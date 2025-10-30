@@ -12,8 +12,8 @@ namespace ProductService.API
 
             configuration.AddEnvironmentVariables();
 
-            if (hostEnvironment.IsDevelopment() && File.Exists("../.env.development"))
-                configuration.AddDotNetEnv("../.env.development");
+            if (hostEnvironment.IsDevelopment() && File.Exists("../.env.local"))
+                configuration.AddDotNetEnv("../.env.local");
 
             services.AddHealthChecks()
                 .AddCheck<PostgresHealthCheck>("postgres");

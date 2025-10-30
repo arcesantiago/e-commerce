@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: ProductService/ProductService.API/Dockerfile
     env_file:
-      - ProductService/.env 
+      - ProductService/.env.development
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
@@ -17,7 +17,7 @@ services:
       context: .
       dockerfile: OrderService/OrderService.API/Dockerfile
     env_file:
-      - OrderService/.env
+      - OrderService/.env.development
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
