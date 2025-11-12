@@ -3,6 +3,7 @@ using ProductService.Application.Common.Validation;
 using ProductService.Application.Contracts.Persistence.Read;
 using ProductService.Application.Contracts.Persistence.Write;
 using ProductService.Application.Models;
+using ProductService.Domain;
 using ProductService.Domain.Common;
 using ProductService.Infrastructure.Percistence;
 using System.Linq.Expressions;
@@ -13,10 +14,10 @@ namespace ProductService.Infrastructure.Repositories
     {
         protected readonly ProductDbContext _context;
         protected readonly DbSet<T> _dbSet;
-        public RepositoryBase(ProductDbContext context, DbSet<T> dbSet)
+        public RepositoryBase(ProductDbContext context)
         {
             _context = context;
-            _dbSet = dbSet;
+            _dbSet = context.Set<T>();
         }
         public async Task<T?> FindAsync(int id, CancellationToken cancellationToken = default)
         {

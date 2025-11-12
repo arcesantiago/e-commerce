@@ -12,10 +12,10 @@ namespace OrderService.Infrastructure.Repositories
     {
         protected readonly OrderDbContext _context;
         protected readonly DbSet<T> _dbSet;
-        public RepositoryBase(OrderDbContext context, DbSet<T> dbSet)
+        public RepositoryBase(OrderDbContext context)
         {
             _context = context;
-            _dbSet = dbSet;
+            _dbSet = context.Set<T>();
         }
         public async Task<T?> FindAsync(int id, CancellationToken cancellationToken = default)
         {

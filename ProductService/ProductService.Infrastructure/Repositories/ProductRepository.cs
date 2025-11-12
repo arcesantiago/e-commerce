@@ -6,7 +6,7 @@ namespace ProductService.Infrastructure.Repositories
 {
     public class ProductRepository : RepositoryBase<Product>, IProductRepository
     {
-        public ProductRepository(ProductDbContext context) : base(context, context.Set<Product>())
+        public ProductRepository(ProductDbContext context) : base(context)
         {
         }
     }
