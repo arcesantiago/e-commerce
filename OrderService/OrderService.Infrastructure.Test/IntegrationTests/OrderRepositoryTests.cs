@@ -5,14 +5,9 @@ using System.Linq.Expressions;
 
 namespace OrderService.Infrastructure.Test.IntegrationTests
 {
-    public class OrderRepositoryTest : IClassFixture<OrderDbFixture>
+    public class OrderRepositoryTest(OrderDbFixture fixture) : IClassFixture<OrderDbFixture>
     {
-        private readonly OrderDbFixture _orderDbFixture;
-
-        public OrderRepositoryTest(OrderDbFixture fixture)
-        {
-            _orderDbFixture = fixture;
-        }
+        private readonly OrderDbFixture _orderDbFixture = fixture;
 
         [Fact]
         public async Task AddAsync_ShouldAddOrderWithItems()
@@ -25,10 +20,10 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
                 Status = OrderStatus.Pending,
                 TotalAmount = 100,
                 OrderDate = DateTime.UtcNow,
-                Items = new List<OrderItem>
-                {
+                Items =
+                [
                     new OrderItem { ProductId = 1, Quantity = 2, UnitPrice = 50 }
-                }
+                ]
             };
 
             var result = await _orderDbFixture.UnitOfWork.Orders.AddAsync(order);
@@ -77,7 +72,7 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
             var result = await _orderDbFixture.UnitOfWork.Orders.GetListAsync(o => o.CustomerId == "CUST-1");
 
             Assert.Single(result);
-            Assert.Equal("CUST-1", result.First().CustomerId);
+            Assert.Equal("CUST-1", result[0].CustomerId);
         }
 
         [Fact]
@@ -89,10 +84,13 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
 
             var result = await _orderDbFixture.UnitOfWork.Orders.GetListAsync(
                 predicate: o => o.Id == order.Id,
-                includes: new() { x => x.Items }
+                includeProperties:
+                [
+                    o => o.Items
+                ]
             );
 
-            var loadedOrder = result.First();
+            var loadedOrder = result[0];
             Assert.NotNull(loadedOrder.Items);
             Assert.Single(loadedOrder.Items);
         }
@@ -106,13 +104,13 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
 
             var result = await _orderDbFixture.UnitOfWork.Orders.GetListAsync(
                 predicate: o => o.Id == order.Id,
-                includes: new List<Expression<Func<Order, object>>>
-                {
+                includeProperties:
+                [
                     o => o.Items
-                }
+                ]
             );
 
-            var loadedOrder = result.First();
+            var loadedOrder = result[0];
             Assert.NotNull(loadedOrder.Items);
             Assert.Single(loadedOrder.Items);
         }
@@ -129,7 +127,7 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
             await _orderDbFixture.UnitOfWork.SaveChangesAsync();
 
             Assert.Equal(OrderStatus.Confirmed, updated.Status);
-            Assert.Equal(OrderStatus.Confirmed, (await _orderDbFixture.UnitOfWork.Orders.GetListAsync()).First().Status);
+            Assert.Equal(OrderStatus.Confirmed, (await _orderDbFixture.UnitOfWork.Orders.GetListAsync())[0].Status);
         }
 
         [Fact]
@@ -153,7 +151,13 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
 
             var order = await SeedOrderAsync();
 
-            var result = await _orderDbFixture.UnitOfWork.Orders.GetEntityAsync(o => o.Id == 1, includes: new() { x => x.Items });
+            var result = await _orderDbFixture.UnitOfWork.Orders.GetEntityAsync(
+                o => o.Id == 1,
+                includeProperties:
+                [
+                    o => o.Items
+                ]
+                );
 
             Assert.NotNull(result);
             Assert.Equal(order.CustomerId, result!.CustomerId);
@@ -167,10 +171,10 @@ namespace OrderService.Infrastructure.Test.IntegrationTests
                 Status = OrderStatus.Pending,
                 TotalAmount = 100,
                 OrderDate = DateTime.UtcNow,
-                Items = new List<OrderItem>
-                {
+                Items =
+                [
                     new OrderItem { ProductId = 1, Quantity = 2, UnitPrice = 50 }
-                }
+                ]
             };
 
             _orderDbFixture.Context.Add(order);

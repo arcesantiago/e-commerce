@@ -11,7 +11,20 @@ namespace OrderService.Application.Features.Orders.Queries.GetOrders
         private readonly IOrderUnitOfWork _orderUnitOfWork = orderUnitOfWork;
         public async Task<List<OrdersVm>> Handle(GetOrdersQuery request, CancellationToken cancellationToken)
         {
-            var orders = await _orderUnitOfWork.Orders.GetListAsync(includes: new() { x => x.Items }, disableTracking: false,cancellationToken: cancellationToken);
+                var orders = await _orderUnitOfWork.Orders.GetListAsync(
+                includeProperties:
+                [
+                    o => o.Items
+                ],
+                //select: x => new Order 
+                //{ 
+                //    Items = x.Items.Select(y => new OrderItem 
+                //    { 
+                //        Id = y.Id 
+                //    }).ToList() 
+                //},
+                disableTracking: false,
+                cancellationToken: cancellationToken);
 
             return _mapper.Map<List<OrdersVm>>(orders);
         }

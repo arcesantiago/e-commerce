@@ -15,7 +15,7 @@ namespace ProductService.Application.Features.Products.Commands.UpdateProduct
         private readonly IProductUnitOfWork _productUnitOfWork = productUnitOfWork;
         public async Task<Unit> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
-            var productToUpdate = await _productUnitOfWork.Products.FindAsync(request.UpdateProductCommandRequest.Id);
+            var productToUpdate = await _productUnitOfWork.Products.FindAsync(request.UpdateProductCommandRequest.Id, cancellationToken);
 
             if (productToUpdate is null)
             {

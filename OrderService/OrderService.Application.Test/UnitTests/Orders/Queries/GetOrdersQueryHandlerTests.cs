@@ -27,16 +27,14 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             // Arrange
             var orders = new List<Order>
             {
-                new Order
-                {
+                new() {
                     Id = 1,
                     CustomerId = "CUST-1",
                     Status = OrderStatus.Pending,
                     TotalAmount = 100,
                     OrderDate = DateTime.UtcNow
                 },
-                new Order
-                {
+                new() {
                     Id = 2,
                     CustomerId = "CUST-2",
                     Status = OrderStatus.Confirmed,
@@ -47,16 +45,17 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
 
             var ordersVm = new List<OrdersVm>
             {
-                new OrdersVm { Id = 1, CustomerId = "CUST-1", Status = OrderStatus.Pending, TotalAmount = 100 },
-                new OrdersVm { Id = 2, CustomerId = "CUST-2", Status = OrderStatus.Confirmed, TotalAmount = 200 }
+                new() { Id = 1, CustomerId = "CUST-1", Status = OrderStatus.Pending, TotalAmount = 100 },
+                new() { Id = 2, CustomerId = "CUST-2", Status = OrderStatus.Confirmed, TotalAmount = 200 }
             };
 
             _orderUnitOfWork
                 .Setup(r => r.Orders.GetListAsync(
-                    It.IsAny<Expression<Func<Order, bool>>>(), 
-                    It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), 
-                    It.IsAny<List<Expression<Func<Order, object>>>>(), 
-                    It.IsAny<bool>(), 
+                    null,
+                    null,
+                    null,
+                    It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(),
+                    It.IsAny<bool>(),
                     It.IsAny<CancellationToken>()
                     ))
                 .ReturnsAsync(orders);
@@ -75,11 +74,12 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             Assert.Equal(2, result.Count);
             Assert.Equal("CUST-1", result[0].CustomerId);
             _orderUnitOfWork.Verify(r => r.Orders.GetListAsync(
-                It.IsAny<Expression<Func<Order, bool>>>(), 
-                It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), 
-                It.IsAny<List<Expression<Func<Order, object>>>>(), 
-                It.IsAny<bool>(), 
-                It.IsAny<CancellationToken>()
+                    null,
+                    null,
+                    null,
+                    It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(),
+                    It.IsAny<bool>(),
+                    It.IsAny<CancellationToken>()
                 ), Times.Once);
 
             _mapperMock.Verify(m => m.Map<List<OrdersVm>>(orders), Times.Once);
@@ -94,9 +94,10 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
 
             _orderUnitOfWork
                 .Setup(r => r.Orders.GetListAsync(
-                    It.IsAny<Expression<Func<Order, bool>>>(), 
-                    It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), 
-                    It.IsAny<List<Expression<Func<Order, object>>>>(), 
+                    null,
+                    null,
+                    null, 
+                    It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(), 
                     It.IsAny<bool>(), 
                     It.IsAny<CancellationToken>()
                     ))
@@ -114,10 +115,12 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             // Assert
             Assert.NotNull(result);
             Assert.Empty(result);
+
             _orderUnitOfWork.Verify(r => r.Orders.GetListAsync(
-                It.IsAny<Expression<Func<Order, bool>>>(), 
-                It.IsAny<Func<IQueryable<Order>, IOrderedQueryable<Order>>>(), 
-                It.IsAny<List<Expression<Func<Order, object>>>>(), 
+                    null,
+                    null,
+                    null,
+                It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(), 
                 It.IsAny<bool>(), 
                 It.IsAny<CancellationToken>()
                 ), Times.Once);

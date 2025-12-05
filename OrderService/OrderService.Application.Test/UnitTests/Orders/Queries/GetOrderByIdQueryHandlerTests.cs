@@ -47,7 +47,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             _orderUnitOfWork
                 .Setup(r => r.Orders.GetEntityAsync(
                     It.IsAny<Expression<Func<Order, bool>>>(),
-                    It.IsAny<List<Expression<Func<Order, object>>>>(),
+                    null,
+                    It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(),
                     false,
                     It.IsAny<CancellationToken>()
                     ))
@@ -67,9 +68,10 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             Assert.Equal(orderVm.Id, result.Id);
             Assert.Equal(orderVm.CustomerId, result.CustomerId);
             _orderUnitOfWork.Verify(r => r.Orders.GetEntityAsync(
-                It.IsAny<Expression<Func<Order, bool>>>(), 
-                It.IsAny<List<Expression<Func<Order, object>>>>(), 
-                false, 
+                It.IsAny<Expression<Func<Order, bool>>>(),
+                null,
+                It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(),
+                false,
                 It.IsAny<CancellationToken>()
                 ), Times.Once);
             _mapperMock.Verify(m => m.Map<OrderVm>(order), Times.Once);
@@ -81,10 +83,11 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             // Arrange
             _orderUnitOfWork
                 .Setup(r => r.Orders.GetEntityAsync(
-                It.IsAny<Expression<Func<Order, bool>>>(),
-                It.IsAny<List<Expression<Func<Order, object>>>>(),
-                false, 
-                It.IsAny<CancellationToken>()
+                    It.IsAny<Expression<Func<Order, bool>>>(),
+                    null,
+                    It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(),
+                    false,
+                    It.IsAny<CancellationToken>()
             ))
                 .ReturnsAsync((Order)null!);
 
@@ -96,8 +99,9 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
 
             _orderUnitOfWork.Verify(r => r.Orders.GetEntityAsync(
                 It.IsAny<Expression<Func<Order, bool>>>(),
-                It.IsAny<List<Expression<Func<Order, object>>>>(),
-                false, 
+                null,
+                It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(),
+                false,
                 It.IsAny<CancellationToken>()
                 ), Times.Once);
             _mapperMock.Verify(m => m.Map<OrderVm>(It.IsAny<Order>()), Times.Never);

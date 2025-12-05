@@ -13,12 +13,13 @@ namespace OrderService.Application.Features.Orders.Queries.GetOrder
         private readonly IOrderUnitOfWork _orderUnitOfWork = orderUnitOfWork;
         public async Task<OrderVm> Handle(GetOrderQuery request, CancellationToken cancellationToken)
         {
-            var order = await _orderUnitOfWork.Orders.GetEntityAsync(x => x.Id == request.Id, new() { x => x.Items}, false, cancellationToken);
+            var order = await _orderUnitOfWork.Orders.GetEntityAsync(
+                x => x.Id == request.Id, 
+                includeProperties: [x => x.Items], 
+                disableTracking: false, 
+                cancellationToken: cancellationToken);
 
-            if (order is null)
-                throw new NotFoundException(nameof(Order), request.Id);
-
-            return _mapper.Map<OrderVm>(order);
+            return order is null ? throw new NotFoundException(nameof(Order), request.Id) : _mapper.Map<OrderVm>(order);
         }
     }
 }

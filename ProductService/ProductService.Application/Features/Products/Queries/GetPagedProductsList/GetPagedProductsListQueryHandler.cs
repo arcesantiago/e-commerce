@@ -18,7 +18,11 @@ namespace ProductService.Application.Features.Products.Queries.GetPagedProductsL
         private readonly IProductUnitOfWork _productUnitOfWork = productUnitOfWork;
         public async Task<PagedResult<PagedProductsListVm>> Handle(GetPagedProductsListQuery request, CancellationToken cancellationToken)
         {
-            var results = await _productUnitOfWork.Products.GetListPaginatedAsync(request.CurrentPage, request.PageSize, disableTracking: false, cancellationToken: cancellationToken);
+            var results = await _productUnitOfWork.Products.GetListPaginatedAsync(
+                request.CurrentPage, 
+                request.PageSize, 
+                disableTracking: false, 
+                cancellationToken: cancellationToken);
 
             return _mapper.Map<PagedResult<PagedProductsListVm>>(results);
         }

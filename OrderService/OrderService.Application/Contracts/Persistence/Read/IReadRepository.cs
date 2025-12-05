@@ -5,16 +5,21 @@ namespace OrderService.Application.Contracts.Persistence.Read
 {
     public interface IReadRepository<T> where T : BaseDomainModel
     {
-        Task<T?> FindAsync(int id, CancellationToken cancellationToken = default);
+        Task<T?> FindAsync(
+            int id, 
+            CancellationToken cancellationToken = default);
         Task<T?> GetEntityAsync(
-            Expression<Func<T, bool>> predicate, 
-            List<Expression<Func<T, object>>>? includes = null, 
-            bool disableTracking = true, 
+            Expression<Func<T, bool>> predicate,
+            Expression<Func<T, T>>? select = null,
+            IEnumerable<Expression<Func<T, object>>>? includeProperties = null,
+            bool disableTracking = true,
             CancellationToken cancellationToken = default);
         Task<IReadOnlyList<T>> GetListAsync(
-            Expression<Func<T, bool>>? predicate = null, 
-            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, 
-            List<Expression<Func<T, object>>>? includes = null, bool disableTracking = true, 
+            Expression<Func<T, bool>>? predicate = null,
+            Expression<Func<T, T>>? select = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+            IEnumerable<Expression<Func<T, object>>>? includeProperties = null,
+            bool disableTracking = true,
             CancellationToken cancellationToken = default);
         Task<IReadOnlyList<T>> FromSqlAsync(
             FormattableString sql,
@@ -22,6 +27,7 @@ namespace OrderService.Application.Contracts.Persistence.Read
         Task<bool> ExistsAsync(
             Expression<Func<T, bool>> predicate,
             CancellationToken cancellationToken = default);
-        Task<int> CountAsync(CancellationToken cancellationToken = default);
+        Task<int> CountAsync(
+            CancellationToken cancellationToken = default);
     }
 }
