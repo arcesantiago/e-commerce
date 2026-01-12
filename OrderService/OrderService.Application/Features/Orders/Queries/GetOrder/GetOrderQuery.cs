@@ -7,13 +7,13 @@ using OrderService.Domain;
 namespace OrderService.Application.Features.Orders.Queries.GetOrder
 {
     public record GetOrderQuery(int Id) : IRequest<OrderVm>;
-    public class GetOrderByIdQueryHandler(IMapper mapper, IOrderUnitOfWork orderUnitOfWork) : IRequestHandler<GetOrderQuery, OrderVm>
+    public class GetOrderByIdQueryHandler(IMapper mapper, IOrderRepository orderRepository) : IRequestHandler<GetOrderQuery, OrderVm>
     {
         private readonly IMapper _mapper = mapper;
-        private readonly IOrderUnitOfWork _orderUnitOfWork = orderUnitOfWork;
+        private readonly IOrderRepository _orderRepository = orderRepository;
         public async Task<OrderVm> Handle(GetOrderQuery request, CancellationToken cancellationToken)
         {
-            var order = await _orderUnitOfWork.Orders.GetEntityAsync(
+            var order = await _orderRepository.GetEntityAsync(
                 x => x.Id == request.Id, 
                 includeProperties: [x => x.Items], 
                 disableTracking: false, 
