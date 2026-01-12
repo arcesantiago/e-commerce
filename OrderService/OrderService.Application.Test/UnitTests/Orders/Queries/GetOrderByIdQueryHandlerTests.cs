@@ -11,15 +11,15 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
 {
     public class GetOrderByIdQueryHandlerTests
     {
-        private readonly Mock<IOrderUnitOfWork> _orderUnitOfWork;
+        private readonly Mock<IOrderRepository> _orderRepository;
         private readonly Mock<IMapper> _mapperMock;
         private readonly GetOrderByIdQueryHandler _handler;
 
         public GetOrderByIdQueryHandlerTests()
         {
-            _orderUnitOfWork = new Mock<IOrderUnitOfWork>();
+            _orderRepository = new Mock<IOrderRepository>();
             _mapperMock = new Mock<IMapper>();
-            _handler = new GetOrderByIdQueryHandler(_mapperMock.Object, _orderUnitOfWork.Object);
+            _handler = new GetOrderByIdQueryHandler(_mapperMock.Object, _orderRepository.Object);
         }
 
         [Fact]
@@ -44,8 +44,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
                 OrderDate = order.OrderDate
             };
 
-            _orderUnitOfWork
-                .Setup(r => r.Orders.GetEntityAsync(
+            _orderRepository
+                .Setup(r => r.GetEntityAsync(
                     It.IsAny<Expression<Func<Order, bool>>>(),
                     null,
                     It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(),
@@ -67,7 +67,7 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             Assert.NotNull(result);
             Assert.Equal(orderVm.Id, result.Id);
             Assert.Equal(orderVm.CustomerId, result.CustomerId);
-            _orderUnitOfWork.Verify(r => r.Orders.GetEntityAsync(
+            _orderRepository.Verify(r => r.GetEntityAsync(
                 It.IsAny<Expression<Func<Order, bool>>>(),
                 null,
                 It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(),
@@ -81,8 +81,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
         public async Task Handle_ShouldThrowNotFoundException_WhenOrderDoesNotExist()
         {
             // Arrange
-            _orderUnitOfWork
-                .Setup(r => r.Orders.GetEntityAsync(
+            _orderRepository
+                .Setup(r => r.GetEntityAsync(
                     It.IsAny<Expression<Func<Order, bool>>>(),
                     null,
                     It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(),
@@ -97,7 +97,7 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _handler.Handle(query, CancellationToken.None));
 
-            _orderUnitOfWork.Verify(r => r.Orders.GetEntityAsync(
+            _orderRepository.Verify(r => r.GetEntityAsync(
                 It.IsAny<Expression<Func<Order, bool>>>(),
                 null,
                 It.IsAny<IEnumerable<Expression<Func<Order, object>>>>(),

@@ -6,14 +6,13 @@ using ProductService.Application.Exceptions;
 using ProductService.Application.Features.Products.Queries.GetProduct;
 using ProductService.Application.Mapping;
 using ProductService.Domain;
-using System.Linq.Expressions;
 
 namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
 {
     public class GetProductQueryHandlerTests
     {
         private readonly IMapper _mapper;
-        private readonly Mock<IProductUnitOfWork> _productUnitOfWorkMock;
+        private readonly Mock<IProductRepository> _productRepository;
 
         public GetProductQueryHandlerTests()
         {
@@ -24,7 +23,7 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
             NullLoggerFactory.Instance);
             _mapper = mapperConfig.CreateMapper();
 
-            _productUnitOfWorkMock = new Mock<IProductUnitOfWork>();
+            _productRepository = new Mock<IProductRepository>();
         }
 
         [Fact(DisplayName = "Handle should return product when exists")]
@@ -39,11 +38,11 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
                 Stock = 5
             };
 
-            _productUnitOfWorkMock
-                .Setup(r => r.Products.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _productRepository
+                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(product);
 
-            var handler = new GetProductQueryHandler(_mapper, _productUnitOfWorkMock.Object);
+            var handler = new GetProductQueryHandler(_mapper, _productRepository.Object);
 
             var query = new GetProductQuery(1);
 
@@ -62,11 +61,11 @@ namespace ProductService.Application.Test.UnitTests.Features.Products.Queries
         public async Task Handle_ShouldThrow_WhenProductNotExists()
         {
             // Arrange
-            _productUnitOfWorkMock
-                .Setup(r => r.Products.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _productRepository
+                .Setup(r => r.FindAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product)null!);
 
-            var handler = new GetProductQueryHandler(_mapper, _productUnitOfWorkMock.Object);
+            var handler = new GetProductQueryHandler(_mapper, _productRepository.Object);
 
             var query = new GetProductQuery(999);
 

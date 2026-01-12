@@ -10,15 +10,15 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
 {
     public class GetOrdersQueryHandlerTests
     {
-        private readonly Mock<IOrderUnitOfWork> _orderUnitOfWork;
+        private readonly Mock<IOrderRepository> _orderRepository;
         private readonly Mock<IMapper> _mapperMock;
         private readonly GetOrdersQueryHandler _handler;
 
         public GetOrdersQueryHandlerTests()
         {
-            _orderUnitOfWork = new Mock<IOrderUnitOfWork>();
+            _orderRepository = new Mock<IOrderRepository>();
             _mapperMock = new Mock<IMapper>();
-            _handler = new GetOrdersQueryHandler(_mapperMock.Object, _orderUnitOfWork.Object);
+            _handler = new GetOrdersQueryHandler(_mapperMock.Object, _orderRepository.Object);
         }
 
         [Fact]
@@ -49,8 +49,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
                 new() { Id = 2, CustomerId = "CUST-2", Status = OrderStatus.Confirmed, TotalAmount = 200 }
             };
 
-            _orderUnitOfWork
-                .Setup(r => r.Orders.GetListAsync(
+            _orderRepository
+                .Setup(r => r.GetListAsync(
                     null,
                     null,
                     null,
@@ -73,7 +73,7 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal("CUST-1", result[0].CustomerId);
-            _orderUnitOfWork.Verify(r => r.Orders.GetListAsync(
+            _orderRepository.Verify(r => r.GetListAsync(
                     null,
                     null,
                     null,
@@ -92,8 +92,8 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             var orders = new List<Order>();
             var ordersVm = new List<OrdersVm>();
 
-            _orderUnitOfWork
-                .Setup(r => r.Orders.GetListAsync(
+            _orderRepository
+                .Setup(r => r.GetListAsync(
                     null,
                     null,
                     null, 
@@ -116,7 +116,7 @@ namespace OrderService.Application.Test.UnitTests.Orders.Queries
             Assert.NotNull(result);
             Assert.Empty(result);
 
-            _orderUnitOfWork.Verify(r => r.Orders.GetListAsync(
+            _orderRepository.Verify(r => r.GetListAsync(
                     null,
                     null,
                     null,
