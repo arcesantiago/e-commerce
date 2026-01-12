@@ -196,7 +196,7 @@ CI/CD básico con GitHub Actions para build, test y build de imágenes.
 
 📬 Documentación de API
 
-Swagger disponible en:
+Swagger disponible en servidor EC2:
 
 ProductService → http://54.175.121.198:8082/swagger
 
